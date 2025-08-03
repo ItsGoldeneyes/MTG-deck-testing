@@ -1,0 +1,144 @@
+1x Anep, Vizier of Hazoret (j25) [R - Attacking Matters] ^Creature,#7ef553^
+1x Armorcraft Judge (j25) [G - Counters] ^Creature,#7ef553^
+1x Atrocious Experiment (clb) [B - Graveyard] ^Noncreature,#00edff^
+1x Awakener Druid (jmp) [G - Lands] ^Creature,#7ef553^
+1x Ayara, First of Locthwain (eld) [B - Morbid Elves] ^Creature,#7ef553^
+1x Barbarian Class (afr) [R - Dice Rolling] ^Noncreature,#00edff^
+1x Battle Cry Goblin (afr) [R - Go Wide] ^Creature,#7ef553^
+1x Beetleback Chief (tdc) [R - Go Wide] ^Creature,#7ef553^
+1x Bitter Triumph (lci) [B - Graveyard] ^Removal,#fb3335^
+1x Bleed Dry (vow) [B - Lifegain/Drain] ^Removal,#fb3335^
+1x Bloodthirsty Aerialist (c21) [B - Lifegain/Drain] ^Creature,#7ef553^
+1x Bounty of Skemfar (j25) [G - Morbid Elves] ^Noncreature,#00edff^
+1x Brazen Dwarf (afr) [R - Dice Rolling] ^Creature,#7ef553^
+1x Bringer of the Last Gift (lci) [B - Graveyard] ^Creature,#7ef553^
+1x Carnivorous Canopy (one) [G - Lands] ^Removal,#fb3335^
+1x Cathartic Pyre (mid) [R - Attacking Matters] ^Removal,#fb3335^
+1x Champion of Lambholt (2xm) [G - Counters] ^Creature,#7ef553^
+1x Chaos Channeler (afr) [R - Attacking Matters] ^Creature,#7ef553^
+1x Chaos Channeler (afr) [R - Dice Rolling] ^Creature,#7ef553^
+1x Choose Your Weapon (afr) [G - Morbid Elves] ^Removal,#fb3335^
+1x Circle of the Moon Druid (afr) [G - Big Stompy (Dinosaur)] ^Creature,#7ef553^
+1x Circuits Act (unf) [R - Dice Rolling] ^Noncreature,#00edff^
+1x Colossal Dreadmaw (j25) [G - Big Stompy (Dinosaur)] ^Creature,#7ef553^
+1x Commune with Dinosaurs (j25) [G - Big Stompy (Dinosaur)] ^Noncreature,#00edff^
+1x Creeping Bloodsucker (j25) [B - Lifegain/Drain] ^Creature,#7ef553^
+1x Critical Hit (afr) [R - Dice Rolling] ^Noncreature,#00edff^
+1x Crushing Canopy (vow) [G - Lands] ^Removal,#fb3335^
+1x Cultivate (dsc) [G - Lands] ^Noncreature,#00edff^
+1x Deadbridge Shaman (ema) [B - Morbid Elves] ^Creature,#7ef553^
+1x Delina, Wild Mage (afr) [R - Dice Rolling] ^Creature,#7ef553^
+1x Desperate Bloodseeker (otj) [B - Graveyard] ^Creature,#7ef553^
+1x Dragon Egg (cmr) [R - Big Stompy (Dragon)] ^Creature,#7ef553^
+1x Dragon Fodder (gnt) [R - Go Wide] ^Noncreature,#00edff^
+1x Dragonlord's Servant (tdc) [R - Big Stompy (Dragon)] ^Creature,#7ef553^
+1x Drana, Liberator of Malakir (lcc) [B - Attacking Matters] ^Creature,#7ef553^
+1x Draugr Recruiter (khm) [B - Attacking Matters] ^Creature,#7ef553^
+1x Dreadmaw's Ire (lci) [R - Big Stompy (Dragon)] ^Removal,#fb3335^
+1x Drider (afr) [B - Attacking Matters] ^Creature,#7ef553^
+1x Drover of the Mighty (j25) [G - Big Stompy (Dinosaur)] ^Creature,#7ef553^
+1x Drowsing Tyrannodon (j25) [G - Big Stompy (Dinosaur)] ^Creature,#7ef553^
+1x Dryad Greenseeker (m19) [G - Lands] ^Creature,#7ef553^
+1x Duskwielder (khm) [B - Lifegain/Drain] ^Creature,#7ef553^
+1x Dwynen's Elite (j25) [G - Morbid Elves] ^Creature,#7ef553^
+1x Earth-Cult Elemental (afr) [R - Dice Rolling] ^Removal,#fb3335^
+1x Elemental Uprising (jmp) [G - Lands] ^Noncreature,#00edff^
+1x Elfsworn Giant (fdn) [G - Morbid Elves] ^Creature,#7ef553^
+1x Elvish Visionary (cma) [G - Morbid Elves] ^Creature,#7ef553^
+1x Elvish Warmaster (khm) [G - Morbid Elves] ^Creature,#7ef553^
+1x Etali, Primal Storm (fdn) [R - Attacking Matters] ^Creature,#7ef553^
+1x Eternal Taskmaster (jmp) [B - Graveyard] ^Creature,#7ef553^
+1x Evolution Sage (lcc) [G - Counters] ^Creature,#7ef553^
+1x Explore (otc) [G - Lands] ^Noncreature,#00edff^
+1x Eyeblight Cullers (khc) [B - Morbid Elves] ^Creature,#7ef553^
+1x Eyeblight's Ending (2x2) [B - Morbid Elves] ^Removal,#fb3335^
+1x Falkenrath Noble (j25) [B - Lifegain/Drain] ^Creature,#7ef553^
+1x Fear of Being Hunted (dsk) [R - Attacking Matters] ^Creature,#7ef553^
+1x Felling Blow (fdn) [G - Counters] ^Removal,#fb3335^
+1x Firecannon Blast (j22) [R - Attacking Matters] ^Removal,#fb3335^
+1x Frenzied Goblin (fdn) [R - Attacking Matters] ^Creature,#7ef553^
+1x Ghalta, Primal Hunger (fdn) [G - Big Stompy (Dinosaur)] ^Creature,#7ef553^
+1x Gilt-Leaf Winnower (cmr) [B - Morbid Elves] ^Removal,#fb3335^
+1x Goblin Assault (mm3) [R - Go Wide] ^Noncreature,#00edff^
+1x Goblin Instigator (moc) [R - Go Wide] ^Creature,#7ef553^
+1x Goblin Morningstar (afr) [R - Dice Rolling] ^Creature,#7ef553^
+1x Goblin Rabblemaster (j25) [R - Go Wide] ^Creature,#7ef553^
+1x Goblin Traprunner (mh2) [R - Go Wide] ^Creature,#7ef553^
+1x Gorging Vulture (clu) [B - Graveyard] ^Creature,#7ef553^
+1x Gutless Plunderer (fdn) [B - Attacking Matters] ^Creature,#7ef553^
+1x Hoarding Ogre (clb) [R - Dice Rolling] ^Creature,#7ef553^
+1x Hoarding Ogre (clb) [R - Attacking Matters] ^Creature,#7ef553^
+1x Hobgoblin Captain (afr) [R - Attacking Matters] ^Creature,#7ef553^
+1x Imperious Perfect (fdn) [G - Morbid Elves] ^Creature,#7ef553^
+1x Ironshell Beetle (j22) [G - Counters] ^Creature,#7ef553^
+1x Koma's Faithful (khm) [B - Lifegain/Drain] ^Creature,#7ef553^
+1x Koma's Faithful (khm) [B - Graveyard] ^Creature,#7ef553^
+1x Krenko, Tin Street Kingpin (j25) [R - Go Wide] ^Creature,#7ef553^
+1x Legion Warboss (grn) [R - Go Wide] ^Creature,#7ef553^
+1x Lightfoot Rogue (afr) [B - Attacking Matters] ^Creature,#7ef553^
+1x Llanowar Elves (fdn) [G - Morbid Elves] ^Creature,#7ef553^
+1x Llanowar Visionary (m21) [G - Morbid Elves] ^Creature,#7ef553^
+1x Marauding Blight-Priest (fdn) [B - Lifegain/Drain] ^Creature,#7ef553^
+1x Miara, Thorn of the Glade (cmr) [B - Morbid Elves] ^Creature,#7ef553^
+1x Molten Exhale (tdm) [R - Big Stompy (Dragon)] ^Removal,#fb3335^
+1x Nadier, Agent of the Duskenel (cmr) [B - Morbid Elves] ^Creature,#7ef553^
+1x Nogi, Draco-Zealot (tdc) [R - Big Stompy (Dragon)] ^Creature,#7ef553^
+1x Oran-Rief Hydra (ddr) [G - Lands] ^Creature,#7ef553^
+1x Orazca Frillback (jmp) [G - Big Stompy (Dinosaur)] ^Creature,#7ef553^
+1x Ornery Dilophosaur (j22) [G - Big Stompy (Dinosaur)] ^Creature,#7ef553^
+1x Polukranos, World Eater (ddl) [G - Counters] ^Creature,#7ef553^
+1x Presence of Gond (jmp) [G - Morbid Elves] ^Noncreature,#00edff^
+1x Prowess of the Fair (khc) [B - Morbid Elves] ^Noncreature,#00edff^
+1x Pyreheart Wolf (dka) [R - Attacking Matters] ^Creature,#7ef553^
+1x Rabid Bite (znr) [G - Counters] ^Removal,#fb3335^
+1x Raid Bombardment (roe) [R - Go Wide] ^Noncreature,#00edff^
+1x Raiders' Wake (xln) [B - Attacking Matters] ^Noncreature,#00edff^
+1x Raise the Draugr (khm) [B - Morbid Elves] ^Noncreature,#00edff^
+1x Ram Through (cmm) [G - Big Stompy (Dinosaur)] ^Removal,#fb3335^
+1x Rapacious Dragon (tdc) [R - Big Stompy (Dragon)] ^Creature,#7ef553^
+1x Reckless Barbarian (clb) [R - Big Stompy (Dragon)] ^Creature,#7ef553^
+1x Red Dragon (afr) [R - Big Stompy (Dragon)] ^Creature,#7ef553^
+1x Relentless Assault (cmr) [R - Attacking Matters] ^Noncreature,#00edff^
+1x Retreat to Kazandu (cmr) [G - Counters] ^Noncreature,#00edff^
+1x Ridgescale Tusker (aer) [G - Counters] ^Creature,#7ef553^
+1x Rishkar, Peema Renegade (cmm) [G - Counters] ^Creature,#7ef553^
+1x Roast (dtk) [R - Big Stompy (Dragon)] ^Removal,#fb3335^
+1x Ruin Raider (xln) [B - Attacking Matters] ^Creature,#7ef553^
+1x Sanguine Bond (c17) [B - Lifegain/Drain] ^Noncreature,#00edff^
+1x Sanguine Syphoner (fdn) [B - Attacking Matters] ^Creature,#7ef553^
+1x Savage Stomp (j25) [G - Big Stompy (Dinosaur)] ^Removal,#fb3335^
+1x Scalestorm Summoner (otj) [R - Attacking Matters] ^Creature,#7ef553^
+1x Screaming Phantom (lci) [B - Graveyard] ^Creature,#7ef553^
+1x Selvala, Heart of the Wilds (cmm) [G - Big Stompy (Dinosaur)] ^Creature,#7ef553^
+1x Shadowheart, Dark Justiciar (clb) [B - Morbid Elves] ^Creature,#7ef553^
+1x Sharpshooter Elf (clb) [G - Morbid Elves] ^Removal,#fb3335^
+1x Silversmote Ghoul (c21) [B - Lifegain/Drain] ^Creature,#7ef553^
+1x Skemfar Shadowsage (khm) [B - Morbid Elves] ^Creature,#7ef553^
+1x Springbloom Druid (fdn) [G - Lands] ^Creature,#7ef553^
+1x Stab Wound (rtr) [B - Attacking Matters] ^Removal,#fb3335^
+1x Stitcher's Supplier (j22) [B - Graveyard] ^Creature,#7ef553^
+1x Sutina, Speaker of the Tajuru (j25) [G - Lands] ^Creature,#7ef553^
+1x Swarming Goblins (afr) [R - Dice Rolling] ^Creature,#7ef553^
+1x Swashbuckler Extraordinaire (clb) [R - Big Stompy (Dragon)] ^Creature,#7ef553^
+1x Thornbow Archer (ori) [B - Morbid Elves] ^Creature,#7ef553^
+1x Thornbow Archer (ori) [B - Attacking Matters] ^Creature,#7ef553^
+1x Thundering Spineback (j25) [G - Big Stompy (Dinosaur)] ^Creature,#7ef553^
+1x Traitorous Greed (m21) [R - Big Stompy (Dragon)] ^Removal,#fb3335^
+1x Tribute to Hunger (ddq) [B - Lifegain/Drain] ^Removal,#fb3335^
+1x Tuskguard Captain (cmm) [G - Counters] ^Creature,#7ef553^
+1x Twilight Prophet (mkc) [B - Lifegain/Drain] ^Creature,#7ef553^
+1x Ulvenwald Hydra (jmp) [G - Lands] ^Creature,#7ef553^
+1x Vampire Nighthawk (j25) [B - Lifegain/Drain] ^Creature,#7ef553^
+1x Viconia, Drow Apostate (clb) [B - Graveyard] ^Creature,#7ef553^
+1x Warmonger Hellkite (clb) [R - Big Stompy (Dragon)] ^Creature,#7ef553^
+1x Wick's Patrol (blb) [B - Graveyard] ^Removal,#fb3335^
+1x Wild Magic Surge (clb) [R - Dice Rolling] ^Removal,#fb3335^
+1x Wildwood Scourge (cmm) [G - Counters] ^Creature,#7ef553^
+1x Wily Goblin (xln) [R - Go Wide] ^Creature,#7ef553^
+1x Wolverine Riders (j22) [G - Morbid Elves] ^Creature,#7ef553^
+1x Woodborn Behemoth (j22) [G - Lands] ^Creature,#7ef553^
+1x Wyll, Blade of Frontiers (clb) [R - Dice Rolling] ^Creature,#7ef553^
+1x Yahenni, Undying Partisan (cmm) [B - Attacking Matters] ^Creature,#7ef553^
+1x You Are Already Dead (neo) [B - Attacking Matters] ^Removal,#fb3335^
+1x You See a Pair of Goblins (afr) [R - Go Wide] ^Noncreature,#00edff^
+1x Young Necromancer (mh2) [B - Graveyard] ^Creature,#7ef553^

@@ -1,0 +1,6 @@
+output/*
+!output/.gitkeep
+!output/sample_deck.dck
+
+input/jumpstart.txt
+!input/sample_jumpstart.txt
