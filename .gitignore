@@ -4,3 +4,5 @@ output/*
 
 input/jumpstart.txt
 !input/sample_jumpstart.txt
+
+.env
