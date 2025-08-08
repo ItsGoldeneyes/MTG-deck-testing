@@ -1,8 +1,8 @@
-output/*
-!output/.gitkeep
-!output/sample_deck.dck
+host/output/*
+!host/output/.gitkeep
+!host/output/sample_deck.dck
 
-input/jumpstart.txt
-!input/sample_jumpstart.txt
+host/input/jumpstart.txt
+!host/input/sample_jumpstart.txt
 
 .env
