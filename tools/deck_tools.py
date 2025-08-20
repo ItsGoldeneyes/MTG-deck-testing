@@ -46,6 +46,40 @@ def generate_deck_files(decks_df, output_path="output/jumpstart"):
     for deck_name in deck_names:
         deck = decks_df[decks_df['deck_name'] == deck_name]
         generate_deck_file(deck, deck_name, output_path)
+        
+    # Copy decks to Forge directory if specified
+    FORGE_DECKS_PATH = os.environ.get("FORGE_DECKS_PATH")
+    if FORGE_DECKS_PATH and os.path.exists(FORGE_DECKS_PATH):
+        print(f"Copying decks to Forge directory: {FORGE_DECKS_PATH}")
+        
+        # Wipe the forge deck directory
+        try:
+            for filename in os.listdir(FORGE_DECKS_PATH):
+                dst_file = os.path.join(FORGE_DECKS_PATH, filename)
+                if os.path.isfile(dst_file) and filename.endswith('.dck'):
+                    os.unlink(dst_file)
+                    print(f"Removed old deck: {filename}")
+        except Exception as e:
+            print(f"Error cleaning Forge decks directory: {e}")
+            
+        # Copy new decks
+        try:
+            deck_count = 0
+            for filename in os.listdir(output_path):
+                if filename.endswith('.dck'):
+                    src = os.path.join(output_path, filename)
+                    dst = os.path.join(FORGE_DECKS_PATH, filename)
+                    if os.path.isfile(src):
+                        with open(src, "rb") as fsrc, open(dst, "wb") as fdst:
+                            fdst.write(fsrc.read())
+                        deck_count += 1
+            print(f"Successfully copied {deck_count} decks to Forge directory")
+        except Exception as e:
+            print(f"Error copying decks to Forge directory: {e}")
+    elif FORGE_DECKS_PATH:
+        print(f"Warning: FORGE_DECKS_PATH is set but directory does not exist: {FORGE_DECKS_PATH}")
+    else:
+        print("FORGE_DECKS_PATH not set, skipping copy to Forge directory")
 
 
 def generate_deck_file(deck, name='Sample Deck', output_path='output/jumpstart'):
