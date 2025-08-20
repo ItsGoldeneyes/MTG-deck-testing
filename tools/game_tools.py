@@ -8,14 +8,16 @@ import os
 # Global lock for thread-safe operations if needed
 game_lock = Lock()
 
-def run_game(deck1_name, deck2_name, num_games=1, working_dir=None):
+def run_game(deck1_name, deck2_name, deck3_name=None, deck4_name=None, game_count=1, working_dir=None, format='jumpstart'):
     """
-    Run a single game between two decks
+    Run a single game between two to four decks
 
     Args:
         deck1_name (str): Name of the first deck
         deck2_name (str): Name of the second deck
-        num_games (int): Number of games to run (default 1)
+        deck3_name (str, optional): Name of the third deck
+        deck4_name (str, optional): Name of the fourth deck
+        game_count (int): Number of games to run (default 1)
         working_dir (str): Working directory for the Java process
 
     Returns:
@@ -29,14 +31,25 @@ def run_game(deck1_name, deck2_name, num_games=1, working_dir=None):
         if working_dir:
             os.chdir(working_dir)
 
-        game_output = subprocess.run([
+        cmd = [
             "java", "-jar", os.path.basename(os.environ.get("FORGE_JAR_PATH", "")),
             "sim", "-d",
-            os.path.join("JUMPSTART", f"{deck1_name}.dck"),
-            os.path.join("JUMPSTART", f"{deck2_name}.dck"),
-            "-m", str(num_games),
+            os.path.join(format.upper(), f"{deck1_name}.dck"),
+            os.path.join(format.upper(), f"{deck2_name}.dck"),
+        ]
+
+        # Add deck3 and deck4 if provided (for 3 to 4 player games)
+        if deck3_name:
+            cmd.append(os.path.join(format.upper(), f"{deck3_name}.dck"))
+        if deck4_name:
+            cmd.append(os.path.join(format.upper(), f"{deck4_name}.dck"))
+
+        cmd.extend([
+            "-n", str(game_count),
             "-q"
-        ], capture_output=True, text=True, timeout=500)
+        ])
+
+        game_output = subprocess.run(cmd, capture_output=True, text=True, timeout=500)
 
         return game_output
     finally:
@@ -338,3 +351,50 @@ def parse_game_results(results):
     print(f"Worst performing deck: {deck_summary.iloc[-1]['deck']} ({deck_summary.iloc[-1]['winrate']:.2%} win rate)")
 
     return deck_summary
+
+# Single-game result parser
+def parse_single_game_result(result):
+    """
+    Parse a single game result dict (as used in worker.py) and return a dict with deck win counts and turn counts.
+
+    Args:
+        result (dict): Should have keys 'deck1', 'deck2', 'deck3', 'deck4', 'result', 'success'
+
+    Returns:
+        dict: {deck1_wins, deck2_wins, deck3_wins, deck4_wins, turn_counts}
+    """
+    if not result.get('success') or not result.get('result'):
+        return {
+            'deck1_wins': 0,
+            'deck2_wins': 0,
+            'deck3_wins': 0,
+            'deck4_wins': 0,
+            'turn_counts': []
+        }
+
+    output = result['result'].stdout
+    lines = output.strip().split('\n')
+    deck_names = [result.get('deck1'), result.get('deck2'), result.get('deck3'), result.get('deck4')]
+    win_counts = [0, 0, 0, 0]
+    turn_counts = []
+
+    for line in lines:
+        if 'game outcome: turn' in line.lower():
+            try:
+                turn_count = int(line.lower().split()[-1])
+                turn_counts.append(turn_count)
+            except (ValueError, IndexError):
+                pass
+        if 'won!' in line.lower():
+            for i, name in enumerate(deck_names):
+                if name and name.lower() in line.lower():
+                    win_counts[i] += 1
+                    break
+
+    return {
+        'deck1_wins': win_counts[0],
+        'deck2_wins': win_counts[1],
+        'deck3_wins': win_counts[2],
+        'deck4_wins': win_counts[3],
+        'turn_counts': turn_counts
+    }
