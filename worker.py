@@ -143,8 +143,7 @@ def check_game_data(interval=10):
             update_decks(format='jumpstart')
             last_deck_check = now
 
-        # max_games = multiprocessing.cpu_count()
-        max_games = 1
+        max_games = multiprocessing.cpu_count()
         if len(current_games) >= max_games:
             logging.info(f"Max games running ({max_games}). Sleeping...")
             time.sleep(30)
