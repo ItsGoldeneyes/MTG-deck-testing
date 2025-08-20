@@ -62,7 +62,7 @@ def update_decks(format='jumpstart'):
 
 def setup_game(game):
     logging.info(f"Starting game {game['primary_key']} with decks: {game['deck1_name']}, {game['deck2_name']}, {game.get('deck3_name')}, {game.get('deck4_name')}")
-    
+
     game_results = run_game(
         deck1_name=game['deck1_name'],
         deck2_name=game['deck2_name'],
@@ -71,13 +71,15 @@ def setup_game(game):
         format=game['format'],
         game_count=game['game_count']
     )
-    
+
     logging.info(f"Game {game['primary_key']} - Return code: {getattr(game_results, 'returncode', 'N/A')}")
-    
+
     if hasattr(game_results, 'stdout') and game_results.stdout:
         logging.info(f"Game {game['primary_key']} - STDOUT length: {len(game_results.stdout)} characters")
         logging.debug(f"Game {game['primary_key']} - STDOUT first 500 chars: {game_results.stdout[:500]}")
-        
+
+        # Ensure output/logs directory exists before writing
+        os.makedirs('output/logs', exist_ok=True)
         # Save full output to file for debugging
         with open(f"output/logs/game_{game['primary_key']}_output.txt", 'w', encoding='utf-8') as f:
             f.write(f"Game {game['primary_key']} Output\n")
@@ -89,10 +91,10 @@ def setup_game(game):
         logging.info(f"Game {game['primary_key']} - Full output saved to output/logs/game_{game['primary_key']}_output.txt")
     else:
         logging.warning(f"Game {game['primary_key']} - No stdout found")
-    
+
     if hasattr(game_results, 'stderr') and game_results.stderr:
         logging.warning(f"Game {game['primary_key']} - STDERR: {game_results.stderr}")
-    
+
     single_result = {
         'deck1': game['deck1_name'],
         'deck2': game['deck2_name'],
@@ -101,12 +103,12 @@ def setup_game(game):
         'result': game_results,
         'success': getattr(game_results, 'returncode', 0) == 0
     }
-    
+
     logging.info(f"Game {game['primary_key']} - Single result success: {single_result['success']}")
-    
+
     parsed_result = parse_single_game_result(single_result)
     logging.info(f"Game {game['primary_key']} - Parsed result: {parsed_result}")
-    
+
     print(parsed_result)
 
     conn, cur = connect()
@@ -170,7 +172,7 @@ def check_game_data(interval=10):
         """)
         rows = cur.fetchall()
         logging.info(f"Found {len(rows)} available games to process")
-        
+
         for row in rows:
             game = {
                 "primary_key": row[0],
@@ -191,7 +193,7 @@ def check_game_data(interval=10):
             """, (DEVICE_ID, row[0]))
             conn.commit()
             logging.info(f"Game {row[0]} successfully claimed by device {DEVICE_ID}")
-            
+
             t = threading.Thread(target=setup_game, args=(game,), daemon=True)
             t.start()
             current_games[row[0]] = t
