@@ -38,8 +38,6 @@ def update_decks(format='jumpstart'):
     conn.close()
 
 def setup_game(game):
-    update_decks(format=game['format'])
-    print(f"decks updated for game {game['primary_key']}!")
     print(f"running game {game['primary_key']}...")
     game_results = run_game(
         deck1_name=game['deck1_name'],
@@ -84,12 +82,20 @@ def setup_game(game):
     current_games.pop(game['primary_key'], None)
 
 
-def check_game_data(interval=30):
+def check_game_data(interval=10):
+    last_deck_check = 0
+    deck_update_interval = 600  # 10 minutes
     while True:
+        now = time.time()
+        if now - last_deck_check > deck_update_interval:
+            print("Checking if decks need update...")
+            update_decks(format='jumpstart')
+            last_deck_check = now
+
         max_games = multiprocessing.cpu_count()
         if len(current_games) >= max_games:
             print(f"Max games running ({max_games}). Sleeping...\n")
-            time.sleep(interval)
+            time.sleep(30)
             continue
 
         time.sleep(interval)
