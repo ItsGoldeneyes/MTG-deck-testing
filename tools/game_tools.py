@@ -40,17 +40,17 @@ def run_game(deck1_name, deck2_name, deck3_name=None, deck4_name=None, game_coun
         cmd = [
             "java", "-jar", os.path.basename(os.environ.get("FORGE_JAR_PATH", "")),
             "sim", "-d",
-            os.path.join(format.upper(), f"{deck1_name}.dck"),
-            os.path.join(format.upper(), f"{deck2_name}.dck"),
+            f"{os.path.join(format.upper(), f'{deck1_name}.dck')}",
+            f"{os.path.join(format.upper(), f'{deck2_name}.dck')}",
         ]
 
         # Add deck3 and deck4 if provided (for 3 to 4 player games)
         if deck3_name:
-            deck3_path = os.path.join(format.upper(), f"{deck3_name}.dck")
+            deck3_path = f"{os.path.join(format.upper(), f'{deck3_name}.dck')}"
             cmd.append(deck3_path)
             logging.info(f"Added deck3: {deck3_path}")
         if deck4_name:
-            deck4_path = os.path.join(format.upper(), f"{deck4_name}.dck")
+            deck4_path = f"{os.path.join(format.upper(), f'{deck4_name}.dck')}"
             cmd.append(deck4_path)
             logging.info(f"Added deck4: {deck4_path}")
 
@@ -62,11 +62,11 @@ def run_game(deck1_name, deck2_name, deck3_name=None, deck4_name=None, game_coun
         logging.info(f"Running command: {' '.join(cmd)}")
 
         game_output = subprocess.run(cmd, capture_output=True, text=True, timeout=game_count*60)
-        
+
         logging.info(f"Game completed with return code: {game_output.returncode}")
         if game_output.returncode != 0:
             logging.error(f"Game failed with stderr: {game_output.stderr}")
-        
+
         return game_output
     except Exception as e:
         logging.error(f"Exception during game execution: {e}")
@@ -384,7 +384,7 @@ def parse_single_game_result(result):
         dict: {deck1_wins, deck2_wins, deck3_wins, deck4_wins, turn_counts}
     """
     logging.info(f"Parsing game result - Success: {result.get('success')}")
-    
+
     if not result.get('success') or not result.get('result'):
         logging.warning("Game result marked as unsuccessful or no result object found")
         return {
@@ -397,7 +397,7 @@ def parse_single_game_result(result):
 
     output = result['result'].stdout
     logging.info(f"Game output length: {len(output) if output else 0} characters")
-    
+
     if not output or not output.strip():
         logging.warning("Game stdout is empty or whitespace only")
         return {
@@ -407,13 +407,13 @@ def parse_single_game_result(result):
             'deck4_wins': 0,
             'turn_counts': []
         }
-    
+
     lines = output.strip().split('\n')
     logging.info(f"Game output has {len(lines)} lines")
-    
+
     deck_names = [result.get('deck1'), result.get('deck2'), result.get('deck3'), result.get('deck4')]
     logging.info(f"Deck names: {deck_names}")
-    
+
     win_counts = [0, 0, 0, 0]
     turn_counts = []
 
@@ -443,10 +443,10 @@ def parse_single_game_result(result):
         'deck4_wins': win_counts[3],
         'turn_counts': turn_counts
     }
-    
+
     logging.info(f"Final parsed result: {result_dict}")
     total_wins = sum(win_counts)
     total_turns = len(turn_counts)
     logging.info(f"Total wins found: {total_wins}, Total turn counts found: {total_turns}")
-    
+
     return result_dict
