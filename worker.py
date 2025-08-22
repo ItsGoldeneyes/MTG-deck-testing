@@ -92,8 +92,8 @@ def setup_game(game):
     else:
         logging.warning(f"Game {game['primary_key']} - No stdout found")
 
-    if hasattr(game_results, 'stderr') and game_results.stderr:
-        logging.warning(f"Game {game['primary_key']} - STDERR: {game_results.stderr}")
+    # if hasattr(game_results, 'stderr') and game_results.stderr:
+    #     logging.warning(f"Game {game['primary_key']} - STDERR: {game_results.stderr}")
 
     single_result = {
         'deck1': game['deck1_name'],
@@ -109,7 +109,7 @@ def setup_game(game):
     parsed_result = parse_single_game_result(single_result)
     logging.info(f"Game {game['primary_key']} - Parsed result: {parsed_result}")
 
-    print(parsed_result)
+    # print(parsed_result)
 
     conn, cur = connect()
     cur.execute("""

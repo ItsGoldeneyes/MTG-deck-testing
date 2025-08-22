@@ -46,12 +46,12 @@ def generate_deck_files(decks_df, output_path="output/jumpstart"):
     for deck_name in deck_names:
         deck = decks_df[decks_df['deck_name'] == deck_name]
         generate_deck_file(deck, deck_name, output_path)
-        
+
     # Copy decks to Forge directory if specified
     FORGE_DECKS_PATH = os.environ.get("FORGE_DECKS_PATH")
     if FORGE_DECKS_PATH and os.path.exists(FORGE_DECKS_PATH):
         print(f"Copying decks to Forge directory: {FORGE_DECKS_PATH}")
-        
+
         # Wipe the forge deck directory
         try:
             for filename in os.listdir(FORGE_DECKS_PATH):
@@ -61,7 +61,7 @@ def generate_deck_files(decks_df, output_path="output/jumpstart"):
                     print(f"Removed old deck: {filename}")
         except Exception as e:
             print(f"Error cleaning Forge decks directory: {e}")
-            
+
         # Copy new decks
         try:
             deck_count = 0

@@ -14,7 +14,7 @@ def connect():
         port=os.getenv("PG_PORT", "5432")
     )
     cur = conn.cursor()
-    print("Connected to PostgreSQL")
+    # print("Connected to PostgreSQL")
     return conn, cur
 
 conn, cur = connect()

@@ -43,8 +43,16 @@ if args['tournament'] not in valid_tournaments:
 
 # Retrieve unique deck names from database for the specified format
 cur.execute(
-    "SELECT DISTINCT deck_name FROM decks WHERE format = %s ORDER BY deck_name ASC;",
-    (args['format'],)
+    """SELECT DISTINCT deck_name
+    FROM decks
+    WHERE format = %s
+    AND uploaded_on = (
+        SELECT MAX(uploaded_on)
+        FROM decks
+        WHERE format = %s
+    )
+    ORDER BY deck_name ASC;""",
+    (args['format'],args['format'])
 )
 deck_names = [row[0] for row in cur.fetchall()]
 

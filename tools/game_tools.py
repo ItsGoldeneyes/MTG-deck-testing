@@ -43,18 +43,18 @@ def run_game(deck1_name, deck2_name, deck3_name=None, deck4_name=None, game_coun
         cmd = [
             "java", "-jar", os.path.basename(os.environ.get("FORGE_JAR_PATH", "")),
             "sim", "-d",
-            f'"{deck1_path}"',
-            f'"{deck2_path}"',
+            deck1_path,
+            deck2_path,
         ]
 
         # Add deck3 and deck4 if provided (for 3 to 4 player games)
         if deck3_name:
             deck3_path = os.path.join(format.upper(), f'{deck3_name}.dck')
-            cmd.append(f'"{deck3_path}"')
+            cmd.append(deck3_path)
             logging.info(f"Added deck3: {deck3_path}")
         if deck4_name:
             deck4_path = os.path.join(format.upper(), f'{deck4_name}.dck')
-            cmd.append(f'"{deck4_path}"')
+            cmd.append(deck4_path)
             logging.info(f"Added deck4: {deck4_path}")
 
         cmd.extend([
