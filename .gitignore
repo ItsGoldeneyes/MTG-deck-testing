@@ -1,8 +1,14 @@
-host/output/*
-!host/output/.gitkeep
-!host/output/sample_deck.dck
+output/*
+!output/.gitkeep
+!output/sample_deck.dck
 
-host/input/jumpstart.txt
-!host/input/sample_jumpstart.txt
+input/jumpstart.txt
+!input/sample_jumpstart.txt
 
 .env
+
+# Ignore all pycaches
+**/__pycache__/
+**/*.pyc
+
+oldfiles/*

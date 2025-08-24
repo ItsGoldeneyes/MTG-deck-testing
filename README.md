@@ -1,6 +1,6 @@
 ### Overview
 
-This tool is designed to enable the playtesting of Jumpstart decks using [Forge](https://github.com/Card-Forge/forge).
+This tool is designed to enable the playtesting of decks using [Forge](https://github.com/Card-Forge/forge).
 
 ### Requirements
 
@@ -11,3 +11,4 @@ This tool is designed to enable the playtesting of Jumpstart decks using [Forge]
 ### Output
 
 - Individual `.dck` files for each deck in the `output/` directory.
+- Games run through `worker.py`
