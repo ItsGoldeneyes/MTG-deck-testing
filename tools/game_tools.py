@@ -32,20 +32,24 @@ def run_game(deck1_name, deck2_name, deck3_name=None, deck4_name=None, game_coun
     logging.info(f"Working directory: {working_dir}")
 
     original_cwd = os.getcwd()
+    logging.info("start try")
     try:
         if working_dir:
+            logging.info("working dir:", working_dir)
             os.chdir(working_dir)
             logging.info(f"Changed to working directory: {os.getcwd()}")
-
+        logging.info("creating deck paths")
         deck1_path = os.path.join(format.upper(), f'{deck1_name}.dck')
         deck2_path = os.path.join(format.upper(), f'{deck2_name}.dck')
-
+        logging.info("creating cmd")
         cmd = [
             "java", "-jar", os.path.basename(os.environ.get("FORGE_JAR_PATH", "")),
             "sim", "-d",
             deck1_path,
             deck2_path,
         ]
+        logging.info(f"Added deck1: {deck1_path}")
+        logging.info(f"Added deck2: {deck2_path}")
 
         # Add deck3 and deck4 if provided (for 3 to 4 player games)
         if deck3_name:
@@ -65,7 +69,8 @@ def run_game(deck1_name, deck2_name, deck3_name=None, deck4_name=None, game_coun
         logging.info(f"Running command: {' '.join(cmd)}")
 
         game_output = subprocess.run(cmd, capture_output=True, text=True, timeout=game_count*60)
-
+        logging.info("Game subprocess completed")
+        logging.info(game_output)
         logging.info(f"Game completed with return code: {game_output.returncode}")
         if game_output.returncode != 0:
             logging.error(f"Game failed with stderr: {game_output.stderr}")
