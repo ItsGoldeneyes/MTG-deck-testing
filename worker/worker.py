@@ -4,7 +4,11 @@ import threading
 import multiprocessing
 import time
 import os
+import sys
 import logging
+
+# Add the resources directory to Python path to import from cloned repository
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'resources'))
 
 from tools.database_tools import connect
 from tools.deck_tools import generate_deck_files
@@ -29,14 +33,14 @@ load_dotenv()
 DEVICE_ID = os.getenv("DEVICE_ID")
 FORGE_JAR_PATH = os.getenv("FORGE_JAR_PATH")
 
-# Log environment setup
-logging.info(f"Device ID: {DEVICE_ID}")
-logging.info(f"Forge JAR Path: {FORGE_JAR_PATH}")
-
 if not FORGE_JAR_PATH:
     logging.error("FORGE_JAR_PATH environment variable not set!")
 if not DEVICE_ID:
     logging.error("DEVICE_ID environment variable not set!")
+
+# Log environment setup
+logging.info(f"Device ID: {DEVICE_ID}")
+logging.info(f"Forge JAR Path: {FORGE_JAR_PATH}")
 
 current_games = {}
 last_deck_update = None
@@ -92,8 +96,8 @@ def setup_game(game):
     else:
         logging.warning(f"Game {game['primary_key']} - No stdout found")
 
-    # if hasattr(game_results, 'stderr') and game_results.stderr:
-    #     logging.warning(f"Game {game['primary_key']} - STDERR: {game_results.stderr}")
+    if hasattr(game_results, 'stderr') and game_results.stderr:
+        logging.warning(f"Game {game['primary_key']} - STDERR: {game_results.stderr}")
 
     single_result = {
         'deck1': game['deck1_name'],
@@ -145,7 +149,8 @@ def check_game_data(interval=10):
             update_decks(format='jumpstart')
             last_deck_check = now
 
-        max_games = multiprocessing.cpu_count()
+        # max_games = multiprocessing.cpu_count()
+        max_games=1
         if len(current_games) >= max_games:
             logging.info(f"Max games running ({max_games}). Sleeping...")
             time.sleep(30)
