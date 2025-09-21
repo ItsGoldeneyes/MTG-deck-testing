@@ -1,25 +1,13 @@
 # syntax=docker/dockerfile:1
-
-# Comments are provided throughout this file to help you get started.
-# If you need more help, visit the Dockerfile reference guide at
-# https://docs.docker.com/go/dockerfile-reference/
-
-# Want to help us make this template better? Share your feedback here: https://forms.gle/ybq9Krt8jtBL3iCk7
-
 ARG PYTHON_VERSION=3.11
 FROM python:${PYTHON_VERSION}-slim AS base
 
-# Prevents Python from writing pyc files.
 ENV PYTHONDONTWRITEBYTECODE=1
-
-# Keeps Python from buffering stdout and stderr to avoid situations where
-# the application crashes without emitting any logs due to buffering.
 ENV PYTHONUNBUFFERED=1
 
 WORKDIR /app
 
-# Create a non-privileged user that the app will run under.
-# See https://docs.docker.com/go/dockerfile-user-best-practices/
+# Create non-privileged user
 ARG UID=10001
 RUN adduser \
     --disabled-password \
@@ -30,56 +18,69 @@ RUN adduser \
     --uid "${UID}" \
     appuser
 
-# Install git, Java 17, and Maven for cloning repositories and building Forge
-RUN apt-get update && apt-get install -y git default-jdk maven && rm -rf /var/lib/apt/lists/*
+# Install dependencies for Python, Java, GUI
+RUN apt-get update && apt-get install -y --no-install-recommends \
+        git \
+        maven \
+        curl \
+        unzip \
+        ca-certificates \
+        xvfb \
+        fonts-dejavu \
+        libasound2 \
+        libasound2-plugins \
+        pulseaudio \
+    && rm -rf /var/lib/apt/lists/*
 
-# Download dependencies as a separate step to take advantage of Docker's caching.
-# Leverage a cache mount to /root/.cache/pip to speed up subsequent builds.
-# Leverage a bind mount to requirements.txt to avoid having to copy them into
-# into this layer.
+# Download and install Temurin OpenJDK 17
+RUN curl -L https://github.com/adoptium/temurin17-binaries/releases/download/jdk-17.0.8+7/OpenJDK17U-jdk_x64_linux_hotspot_17.0.8_7.tar.gz \
+    -o /tmp/openjdk17.tar.gz && \
+    mkdir -p /opt/java && \
+    tar -xzf /tmp/openjdk17.tar.gz -C /opt/java && \
+    rm /tmp/openjdk17.tar.gz
+
+ENV JAVA_HOME=/opt/java/jdk-17.0.8+7
+ENV PATH="$JAVA_HOME/bin:$PATH"
+
+# Download Python dependencies
 RUN --mount=type=cache,target=/root/.cache/pip \
     --mount=type=bind,source=requirements.txt,target=requirements.txt \
     python -m pip install -r requirements.txt
 
-# Clone the MTG-deck-testing repository into resources directory
-RUN git clone https://github.com/ItsGoldeneyes/MTG-deck-testing.git /app/resources
-
-# Clone the Forge repository
+# Clone and build Forge
 RUN git clone https://github.com/Card-Forge/forge.git /app/forge
-
-# Build Forge using Maven
 WORKDIR /app/forge
 RUN mvn -U -B clean -P windows-linux install -DskipTests
-
-# Copy forge-gui/res folder to forge-gui-desktop
 RUN cp -r forge-gui/res forge-gui-desktop/target/
+RUN cp -r forge-gui-desktop/target/* /app/
 
-# Find the built JAR file and create a script to set the environment variable
+# Create Forge environment script
 RUN FORGE_JAR=$(find /app/forge -name "*forge-gui-desktop*jar-with-dependencies.jar" | head -1) && \
-    echo "Found Forge JAR at: $FORGE_JAR" && \
     echo "#!/bin/bash" > /app/set_forge_path.sh && \
     echo "export FORGE_JAR_PATH='$FORGE_JAR'" >> /app/set_forge_path.sh && \
     echo "export FORGE_DECKS_PATH='/nonexistent/.forge/decks/constructed/JUMPSTART'" >> /app/set_forge_path.sh && \
     chmod +x /app/set_forge_path.sh
 
-# Create Forge directory structure for appuser
+# Create necessary directories for Forge
 RUN mkdir -p /nonexistent/.forge/decks/constructed/JUMPSTART && chown -R appuser:appuser /nonexistent/.forge
-
-# Reset working directory
-WORKDIR /app
-
-# Create output directory structure and set proper permissions for appuser
 RUN mkdir -p /app/output/logs /app/output/jumpstart && chown -R appuser:appuser /app/output
 
-# Switch to the non-privileged user to run the application.
+WORKDIR /app
 USER appuser
 
-# Copy the source code into the container.
 COPY . .
 
-# Expose the port that the application listens on.
 EXPOSE 5000
 
-# Run the application.
-# CMD gunicorn 'worker:app' --bind=0.0.0.0:5000
-CMD ["/bin/bash", "-c", "source /app/set_forge_path.sh && python worker.py"]
+# Entrypoint script to auto-start Xvfb
+RUN echo '#!/bin/sh\n\
+mkdir -p /tmp/.X11-unix && chmod 1777 /tmp/.X11-unix\n\
+if ! pgrep Xvfb > /dev/null; then\n\
+  Xvfb :99 -screen 0 1024x768x16 &\n\
+fi\n\
+export DISPLAY=:99\n\
+exec "$@"' > /app/entrypoint.sh && chmod +x /app/entrypoint.sh
+ENTRYPOINT ["/app/entrypoint.sh"]
+
+# Default command runs your Python worker
+CMD ["bash", "-c", "source /app/set_forge_path.sh && python worker.py"]
