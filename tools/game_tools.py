@@ -6,9 +6,6 @@ import time
 import os
 import logging
 
-# Global lock for thread-safe operations if needed
-game_lock = Lock()
-
 def run_game(deck1_name, deck2_name, deck3_name=None, deck4_name=None, game_count=1, working_dir=None, format='jumpstart'):
     """
     Run a single game between two to four decks
@@ -83,82 +80,6 @@ def run_game(deck1_name, deck2_name, deck3_name=None, deck4_name=None, game_coun
         os.chdir(original_cwd)
         logging.debug(f"Restored working directory: {os.getcwd()}")
 
-def run_games_multithreaded(deck_pairs, num_games_per_pair=10, max_workers=4):
-    """
-    Run multiple games concurrently using ThreadPoolExecutor
-
-    Args:
-        deck_pairs (list): List of tuples containing (deck1_name, deck2_name)
-        num_games_per_pair (int): Number of games to run for each deck pair
-        max_workers (int): Maximum number of concurrent threads
-
-    Returns:
-        list: List of results for each game
-    """
-    results = []
-
-    with concurrent.futures.ThreadPoolExecutor(max_workers=max_workers) as executor:
-        # Submit all games to the thread pool
-        future_to_decks = {}
-
-        for deck1, deck2 in deck_pairs:
-            future = executor.submit(run_game, deck1, deck2, num_games_per_pair)
-            future_to_decks[future] = (deck1, deck2)
-
-        # Collect results as they complete
-        for future in concurrent.futures.as_completed(future_to_decks):
-            deck1, deck2 = future_to_decks[future]
-            try:
-                result = future.result()
-                results.append({
-                    'deck1': deck1,
-                    'deck2': deck2,
-                    'result': result,
-                    'success': result.returncode == 0
-                })
-                print(f"Completed: {deck1} vs {deck2}")
-            except Exception as exc:
-                print(f"Game {deck1} vs {deck2} generated an exception: {exc}")
-                results.append({
-                    'deck1': deck1,
-                    'deck2': deck2,
-                    'result': None,
-                    'success': False,
-                    'error': str(exc)
-                })
-
-    return results
-
-def run_games_batch(deck_pairs, num_games_per_pair=10, max_workers=4, batch_size=None):
-    """
-    Run games in batches to avoid overwhelming the system
-
-    Args:
-        deck_pairs (list): List of tuples containing (deck1_name, deck2_name)
-        num_games_per_pair (int): Number of games to run for each deck pair
-        max_workers (int): Maximum number of concurrent threads
-        batch_size (int): Number of deck pairs to process in each batch (default: max_workers * 2)
-
-    Returns:
-        list: List of results for all games
-    """
-    if batch_size is None:
-        batch_size = max_workers * 2
-
-    all_results = []
-
-    for i in range(0, len(deck_pairs), batch_size):
-        batch = deck_pairs[i:i + batch_size]
-        print(f"Processing batch {i//batch_size + 1}/{(len(deck_pairs) + batch_size - 1)//batch_size}")
-
-        batch_results = run_games_multithreaded(batch, num_games_per_pair, max_workers)
-        all_results.extend(batch_results)
-
-        # Optional: Add a small delay between batches to prevent system overload
-        time.sleep(0.5)
-
-    return all_results
-
 def get_all_deck_combinations():
     """
     Get all possible deck combinations from the output directory
@@ -182,93 +103,6 @@ def get_all_deck_combinations():
         for deck2 in deck_names[i+1:]:  # Avoid duplicates and self-matches
             deck_pairs.append((deck1, deck2))
     return deck_pairs
-
-def get_sample_deck_combinations(num_combinations=10):
-    """
-    Get a sample of deck combinations for testing
-
-    Args:
-        num_combinations (int): Number of random combinations to return
-
-    Returns:
-        list: List of tuples containing (deck1_name, deck2_name)
-    """
-    import random
-    all_combinations = get_all_deck_combinations()
-
-    if len(all_combinations) <= num_combinations:
-        return all_combinations
-
-    return random.sample(all_combinations, num_combinations)
-
-def evaluate_all_decks_multithreaded(num_games=10, max_workers=4):
-    """
-    Evaluate all deck combinations using multithreading
-
-    Args:
-        num_games (int): Number of games to run for each deck pair
-        max_workers (int): Maximum number of concurrent threads
-
-    Returns:
-        list: Results from all games
-    """
-    deck_pairs = get_all_deck_combinations()
-    print(f"Found {len(deck_pairs)} deck combinations to evaluate")
-
-    if not deck_pairs:
-        print("No deck combinations found. Make sure decks have been generated first.")
-        return []
-
-    print(f"Running {num_games} games per combination with {max_workers} workers...")
-    start_time = time.time()
-
-    results = run_games_batch(deck_pairs, num_games, max_workers)
-
-    end_time = time.time()
-    print(f"Completed in {end_time - start_time:.2f} seconds")
-
-    # Summary statistics
-    successful_games = sum(1 for r in results if r['success'])
-    failed_games = len(results) - successful_games
-
-    print(f"Results: {successful_games} successful, {failed_games} failed")
-
-    return results
-
-def evaluate_sample_decks_multithreaded(num_combinations=10, num_games=10, max_workers=4):
-    """
-    Evaluate a sample of deck combinations using multithreading (useful for testing)
-
-    Args:
-        num_combinations (int): Number of random deck combinations to test
-        num_games (int): Number of games to run for each deck pair
-        max_workers (int): Maximum number of concurrent threads
-
-    Returns:
-        list: Results from all games
-    """
-    deck_pairs = get_sample_deck_combinations(num_combinations)
-    print(f"Testing {len(deck_pairs)} random deck combinations")
-
-    if not deck_pairs:
-        print("No deck combinations found. Make sure decks have been generated first.")
-        return []
-
-    print(f"Running {num_games} games per combination with {max_workers} workers...")
-    start_time = time.time()
-
-    results = run_games_batch(deck_pairs, num_games, max_workers)
-
-    end_time = time.time()
-    print(f"Completed in {end_time - start_time:.2f} seconds")
-
-    # Summary statistics
-    successful_games = sum(1 for r in results if r['success'])
-    failed_games = len(results) - successful_games
-
-    print(f"Results: {successful_games} successful, {failed_games} failed")
-
-    return results
 
 def parse_game_results(results):
     """
@@ -380,7 +214,6 @@ def parse_game_results(results):
 
     return deck_summary
 
-# Single-game result parser
 def parse_single_game_result(result):
     """
     Parse a single game result dict (as used in worker.py) and return a dict with deck win counts and turn counts.

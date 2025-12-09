@@ -34,7 +34,9 @@ cards_df = add_lands(cards_df)
 
 assert len(cards_df['deck_name'].unique()) == cards_df['quantity'].astype(int).sum() // 20, "Deck count does not match expected value (cards/20)"
 
-decks_df = generate_decklists(cards_df)
+# Commented out to upload just half decks for testing
+decks_df = cards_df
+# decks_df = generate_decklists(cards_df)
 
 # Add audit columns to decks_df
 decks_df.insert(0, 'primary_key', [str(uuid.uuid4()) for _ in range(len(decks_df))])
