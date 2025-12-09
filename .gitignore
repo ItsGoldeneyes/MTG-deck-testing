@@ -5,6 +5,8 @@ output/*
 input/jumpstart.txt
 !input/sample_jumpstart.txt
 
+test.ipynb
+
 .env
 
 # Ignore all pycaches
