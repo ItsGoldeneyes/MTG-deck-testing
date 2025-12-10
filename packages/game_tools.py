@@ -80,30 +80,6 @@ def run_game(deck1_name, deck2_name, deck3_name=None, deck4_name=None, game_coun
         os.chdir(original_cwd)
         logging.debug(f"Restored working directory: {os.getcwd()}")
 
-def get_all_deck_combinations():
-    """
-    Get all possible deck combinations from the output directory
-    Each .dck file is a complete deck, so we create pairs of these decks to play against each other
-
-    Returns:
-        list: List of tuples containing (deck1_name, deck2_name) where each name is a complete deck file name (without .dck extension)
-    """
-    jumpstart_dir = os.path.join('output', 'jumpstart')
-    if not os.path.exists(jumpstart_dir):
-        return []
-
-    # Get all deck file names (without .dck extension)
-    deck_names = [f[:-4] for f in os.listdir(jumpstart_dir) if f.endswith('.dck')]
-
-    # deck_names = [name for name in deck_names if 'living' in name.lower() or 'dragons' in name.lower()]
-
-    # Create all possible combinations of decks
-    deck_pairs = []
-    for i, deck1 in enumerate(deck_names):
-        for deck2 in deck_names[i+1:]:  # Avoid duplicates and self-matches
-            deck_pairs.append((deck1, deck2))
-    return deck_pairs
-
 def parse_game_results(results):
     """
     Parse game results to extract win rates and statistics, creating one row per deck

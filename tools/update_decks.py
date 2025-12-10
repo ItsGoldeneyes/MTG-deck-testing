@@ -3,9 +3,9 @@ import io
 import uuid
 from datetime import datetime
 
-from tools.deck_tools import *
-# from tools.game_tools import *
-from tools.database_tools import conn, cur
+from packages.deck_tools import *
+# from packages.game_tools import *
+from packages.database_tools import conn, cur
 
 """
 Parse jumpstart decks at input directory or commandline argument, if specified

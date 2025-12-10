@@ -4,11 +4,20 @@ import psycopg2
 from dotenv import load_dotenv
 import io
 import uuid
+import itertools
+import sys
+from pathlib import Path
 from datetime import datetime
 
-from tools.deck_tools import *
-# from tools.game_tools import *
-from tools.database_tools import conn, cur
+# Make repository root importable so `packages` can be imported when
+# running this script from a subdirectory (like `tools/`).
+REPO_ROOT = Path(__file__).resolve().parent.parent
+if str(REPO_ROOT) not in sys.path:
+    sys.path.insert(0, str(REPO_ROOT))
+
+from packages.deck_tools import *
+# from packages.game_tools import *
+from packages.database_tools import conn, cur
 import pandas as pd
 
 """
