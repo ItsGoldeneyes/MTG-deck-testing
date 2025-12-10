@@ -6,9 +6,9 @@ import time
 import os
 import logging
 
-from tools.database_tools import connect
-from tools.deck_tools import generate_deck_files
-from tools.game_tools import run_game, parse_single_game_result
+from packages.database_tools import connect
+from packages.deck_tools import generate_deck_files
+from packages.game_tools import run_game, parse_single_game_result
 import pandas as pd
 
 # Configure logging
@@ -39,31 +39,75 @@ if not DEVICE_ID:
     logging.error("DEVICE_ID environment variable not set!")
 
 current_games = {}
-last_deck_update = None
 
-def update_decks(format='jumpstart'):
-    global last_deck_update
+def update_decks(
+    decks = [],
+    format='constructed'
+    ):
+    """ 
+    Update local deck files by pulling from database
+    Args:
+        decks (list): List of deck names to update. If empty, update all decks.
+        format (str): Game format (constructed, commander, jumpstart)
+    """
 
     conn, cur = connect()
-    cur.execute("SELECT MAX(uploaded_on) FROM decks")
-    latest_uploaded_on = cur.fetchone()[0]
+    # TODO: Check if decks need to be updated
+    # cur.execute(f"""
+    #             SELECT MAX(uploaded_on) FROM decks
+    #             WHERE format = {format}
+    #             """)
+    # latest_uploaded_on = cur.fetchone()[0]
 
-    if last_deck_update is None or (latest_uploaded_on and last_deck_update < latest_uploaded_on):
+    query = f"""
+        SELECT * FROM decks 
+        WHERE format = '{format}'
+        """
+    if decks:
+        placeholders = ','.join(['%s'] * len(decks))
+        query += f"\nAND deck_name IN ({placeholders})"
+        cur.execute(query, decks)
+    else:
+        cur.execute(query)
+        
+    rows = cur.fetchall()
+    decks_df = pd.DataFrame(rows, columns=[desc[0] for desc in cur.description])
+    
+    if format == 'jumpstart':
+        if len(decks) != 4:
+            raise ValueError("Jumpstart games must include exactly 4 decks (2 half decks)")
+        # Combine decks 0 and 1, then combine decks 2 and 3 (for 4-player jumpstart)
+        if len(decks) >= 2:
+            mask1 = (decks_df['deck_name'] == decks[0]) | (decks_df['deck_name'] == decks[1])
+            decks_df.loc[mask1, 'deck_name'] = str(decks[0]) + ' ' + str(decks[1])
+        
+        if len(decks) >= 4:
+            mask2 = (decks_df['deck_name'] == decks[2]) | (decks_df['deck_name'] == decks[3])
+            decks_df.loc[mask2, 'deck_name'] = str(decks[2]) + ' ' + str(decks[3])
+        
+    print(decks_df.head())
 
-        cur.execute("SELECT * FROM decks WHERE uploaded_on = (SELECT MAX(uploaded_on) FROM decks)")
-        decks = cur.fetchall()
-        decks_df = pd.DataFrame(decks, columns=[desc[0] for desc in cur.description])
-        # print(decks_df.head())
-
-        generate_deck_files(decks_df, output_path=f'output/{format}')
-        last_deck_update = latest_uploaded_on
+    generate_deck_files(decks_df, output_path=f'output/{format}')
 
     conn.close()
+    
+    print(decks)
+    return decks
 
 def setup_game(game):
     logging.info(f"Starting game {game['primary_key']} with decks: {game['deck1_name']}, {game['deck2_name']}, {game.get('deck3_name')}, {game.get('deck4_name')}")
 
-    game_results = run_game(
+    game['deck1_name'], game['deck2_name'], game['deck3_name'], game['deck4_name'] = update_decks(
+        [
+            game['deck1_name'],
+            game['deck2_name'],
+            game['deck3_name'],
+            game['deck4_name'],
+        ],
+        game['format'],
+    )
+        
+    game['results'] = run_game(
         deck1_name=game['deck1_name'],
         deck2_name=game['deck2_name'],
         deck3_name=game['deck3_name'],
@@ -72,11 +116,11 @@ def setup_game(game):
         game_count=game['game_count']
     )
 
-    logging.info(f"Game {game['primary_key']} - Return code: {getattr(game_results, 'returncode', 'N/A')}")
+    logging.info(f"Game {game['primary_key']} - Return code: {getattr(game['results'], 'returncode', 'N/A')}")
 
-    if hasattr(game_results, 'stdout') and game_results.stdout:
-        logging.info(f"Game {game['primary_key']} - STDOUT length: {len(game_results.stdout)} characters")
-        logging.debug(f"Game {game['primary_key']} - STDOUT first 500 chars: {game_results.stdout[:500]}")
+    if hasattr(game['results'], 'stdout') and game['results'].stdout:
+        logging.info(f"Game {game['primary_key']} - STDOUT length: {len(game['results'].stdout)} characters")
+        logging.debug(f"Game {game['primary_key']} - STDOUT first 500 chars: {game['results'].stdout[:500]}")
 
         # Ensure output/logs directory exists before writing
         os.makedirs('output/logs', exist_ok=True)
@@ -84,24 +128,24 @@ def setup_game(game):
         with open(f"output/logs/game_{game['primary_key']}_output.txt", 'w', encoding='utf-8') as f:
             f.write(f"Game {game['primary_key']} Output\n")
             f.write(f"Decks: {game['deck1_name']}, {game['deck2_name']}, {game.get('deck3_name')}, {game.get('deck4_name')}\n")
-            f.write(f"Return code: {game_results.returncode}\n")
-            f.write(f"STDOUT:\n{game_results.stdout}\n")
-            if game_results.stderr:
-                f.write(f"STDERR:\n{game_results.stderr}\n")
+            f.write(f"Return code: {game['results'].returncode}\n")
+            f.write(f"STDOUT:\n{game['results'].stdout}\n")
+            if game['results'].stderr:
+                f.write(f"STDERR:\n{game['results'].stderr}\n")
         logging.info(f"Game {game['primary_key']} - Full output saved to output/logs/game_{game['primary_key']}_output.txt")
     else:
         logging.warning(f"Game {game['primary_key']} - No stdout found")
 
-    # if hasattr(game_results, 'stderr') and game_results.stderr:
-    #     logging.warning(f"Game {game['primary_key']} - STDERR: {game_results.stderr}")
+    # if hasattr(game['results'], 'stderr') and game['results'].stderr:
+    #     logging.warning(f"Game {game['primary_key']} - STDERR: {game['results'].stderr}")
 
     single_result = {
         'deck1': game['deck1_name'],
         'deck2': game['deck2_name'],
         'deck3': game.get('deck3_name'),
         'deck4': game.get('deck4_name'),
-        'result': game_results,
-        'success': getattr(game_results, 'returncode', 0) == 0
+        'result': game['results'],
+        'success': getattr(game['results'], 'returncode', 0) == 0
     }
 
     logging.info(f"Game {game['primary_key']} - Single result success: {single_result['success']}")
@@ -136,15 +180,7 @@ def setup_game(game):
 
 
 def check_game_data(interval=10):
-    deck_update_interval = 600
-    last_deck_check = 0
     while True:
-        now = time.time()
-        if now - last_deck_check > deck_update_interval:
-            logging.info("Checking if decks need update...")
-            update_decks(format='jumpstart')
-            last_deck_check = now
-
         max_games = multiprocessing.cpu_count()
         if len(current_games) >= max_games:
             logging.info(f"Max games running ({max_games}). Sleeping...")
