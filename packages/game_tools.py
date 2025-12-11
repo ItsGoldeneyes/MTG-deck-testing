@@ -1,12 +1,102 @@
-from threading import Lock
-import subprocess
-import concurrent.futures
 import pandas as pd
-import time
+import subprocess
+from datetime import datetime
+import uuid
 import os
+import io
 import logging
+from packages.database_tools import conn, cur
 
-def run_game(deck1_name, deck2_name, deck3_name=None, deck4_name=None, game_count=1, working_dir=None, format='constructed'):
+
+def create_game(decks,
+                format='constructed',
+                num_games=1,
+                print_decks=False):
+
+
+
+    # Ensure all variables have valid values
+    valid_formats = ['constructed', 'commander', 'jumpstart']
+    if format not in valid_formats:
+        raise ValueError(f"Invalid format '{format}'. Valid options are: {', '.join(valid_formats)}.")
+
+    # Retrieve unique deck names from database for the specified format
+    cur.execute(
+        f"""SELECT DISTINCT deck_name
+        FROM decks
+        WHERE format = '{format}'
+        ORDER BY deck_name ASC;""",
+    )
+    deck_names = [row[0] for row in cur.fetchall()]
+
+    # Check decks against deck_names
+    if decks == 'all':
+        selected_decks = deck_names
+    else:
+        selected_decks = [d.strip() for d in decks.split(',')]
+        missing_decks = set(selected_decks) - set(deck_names)
+        if missing_decks:
+            raise ValueError(f"Deck(s) not found: {', '.join(missing_decks)}, run -p without -d to see all valid decks for format -f")
+
+    # Print decks if argument is true
+    if print_decks == True:
+        print(selected_decks)
+        cur.close()
+        conn.close()
+        quit()
+
+    if format == 'commander' or format == 'jumpstart':
+        player_count = 4
+        assert len(selected_decks) == 4, f"{format} games require four decks, to be paired as two half decks"
+    else:
+        player_count = 2
+        assert len(selected_decks) == 2, f"{format} games require two decks"
+
+    # Assign deck names
+    player_dict = {}
+    for i in range(player_count):
+        player_dict[f'deck{i+1}_name'] = selected_decks[i]
+    # Fill remaining with None if less than 4 players
+    for i in range(player_count, 4):
+        player_dict[f'deck{i+1}_name'] = None
+
+    games_df = pd.DataFrame([player_dict])
+
+    games_df.insert(0, 'primary_key', [str(uuid.uuid4()) for _ in range(len(games_df))])
+    games_df['job_id'] = str(uuid.uuid4())
+    games_df['game_count'] = num_games
+    games_df['deck1_wins'] = [0] * len(games_df)
+    games_df['deck2_wins'] = [0] * len(games_df)
+    games_df['deck3_wins'] = [0] * len(games_df)
+    games_df['deck4_wins'] = [0] * len(games_df)
+    games_df['turn_counts'] = [[]] * len(games_df)
+    games_df['device_id'] = [None] * len(games_df)
+    games_df['format'] = format
+    games_df['created_on'] = datetime.now().isoformat()
+    games_df['finished_on'] = [None] * len(games_df)
+
+    print(games_df.head())
+
+    # Prepare a CSV buffer from the DataFrame
+    csv_buffer = io.StringIO()
+    games_df.to_csv(csv_buffer, index=False, header=False, sep='\t', na_rep='\\N')
+    csv_buffer.seek(0)
+
+    cur.copy_from(csv_buffer, 'games', sep='\t')
+    conn.commit()
+    print("Successfully uploaded game to database")
+
+    cur.close()
+    conn.close()
+
+def run_game(deck1_name,
+             deck2_name,
+             deck3_name=None,
+             deck4_name=None,
+             game_count=1,
+             working_dir=None,
+             format='constructed',
+             ):
     """
     Run a single game between two to four decks
 
@@ -269,9 +359,9 @@ def parse_single_game_result(result):
         'turn_counts': turn_counts
     }
 
-    logging.info(f"Final parsed result: {result_dict}")
+    # logging.info(f"Final parsed result: {result_dict}")
     total_wins = sum(win_counts)
     total_turns = len(turn_counts)
-    logging.info(f"Total wins found: {total_wins}, Total turn counts found: {total_turns}")
+    # logging.info(f"Total wins found: {total_wins}, Total turn counts found: {total_turns}")
 
     return result_dict
