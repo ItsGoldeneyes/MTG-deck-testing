@@ -9,14 +9,11 @@ import sys
 from pathlib import Path
 from datetime import datetime
 
-# Make repository root importable so `packages` can be imported when
-# running this script from a subdirectory (like `tools/`).
 REPO_ROOT = Path(__file__).resolve().parent.parent
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
 from packages.deck_tools import *
-# from packages.game_tools import *
 from packages.database_tools import conn, cur
 import pandas as pd
 
@@ -52,16 +49,10 @@ if args['tournament'] not in valid_tournaments:
 
 # Retrieve unique deck names from database for the specified format
 cur.execute(
-    """SELECT DISTINCT deck_name
+    f"""SELECT DISTINCT deck_name
     FROM decks
-    WHERE format = %s
-    AND uploaded_on = (
-        SELECT MAX(uploaded_on)
-        FROM decks
-        WHERE format = %s
-    )
+    WHERE format = '{args['format']}'
     ORDER BY deck_name ASC;""",
-    (args['format'],args['format'])
 )
 deck_names = [row[0] for row in cur.fetchall()]
 
@@ -81,26 +72,23 @@ if args["print_decks"] == True:
     conn.close()
     quit()
 
-
 # Create all combinations of decks
-if args['format'] == 'commander':
+if args['format'] == 'commander' or args['format'] == 'jumpstart':
     player_count = 4
+    assert len(selected_decks) == 4, f"{args['format']} games require four decks, to be paired as two half decks"
 else:
     player_count = 2
+    assert len(selected_decks) == 2, f"{args['format']} games require two decks"
 
-deck_combinations = itertools.combinations(selected_decks, player_count)
-# Convert combinations to list of dicts for DataFrame
-combo_dicts = []
-for combo in deck_combinations:
-    row = {}
-    for i in range(player_count):
-        row[f'deck{i+1}_name'] = combo[i]
-    # Fill remaining with None if less than 4 players
-    for i in range(player_count, 4):
-        row[f'deck{i+1}_name'] = None
-    combo_dicts.append(row)
+# Assign deck names
+player_dict = {}
+for i in range(player_count):
+    player_dict[f'deck{i+1}_name'] = selected_decks[i]
+# Fill remaining with None if less than 4 players
+for i in range(player_count, 4):
+    player_dict[f'deck{i+1}_name'] = None
 
-games_df = pd.DataFrame(combo_dicts)
+games_df = pd.DataFrame([player_dict])
 
 games_df.insert(0, 'primary_key', [str(uuid.uuid4()) for _ in range(len(games_df))])
 games_df['job_id'] = str(uuid.uuid4())

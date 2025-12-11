@@ -44,7 +44,7 @@ def update_decks(
     decks = [],
     format='constructed'
     ):
-    """ 
+    """
     Update local deck files by pulling from database
     Args:
         decks (list): List of deck names to update. If empty, update all decks.
@@ -60,7 +60,7 @@ def update_decks(
     # latest_uploaded_on = cur.fetchone()[0]
 
     query = f"""
-        SELECT * FROM decks 
+        SELECT * FROM decks
         WHERE format = '{format}'
         """
     if decks:
@@ -69,35 +69,36 @@ def update_decks(
         cur.execute(query, decks)
     else:
         cur.execute(query)
-        
+
     rows = cur.fetchall()
     decks_df = pd.DataFrame(rows, columns=[desc[0] for desc in cur.description])
-    
+
     if format == 'jumpstart':
         if len(decks) != 4:
             raise ValueError("Jumpstart games must include exactly 4 decks (2 half decks)")
-        # Combine decks 0 and 1, then combine decks 2 and 3 (for 4-player jumpstart)
-        if len(decks) >= 2:
-            mask1 = (decks_df['deck_name'] == decks[0]) | (decks_df['deck_name'] == decks[1])
-            decks_df.loc[mask1, 'deck_name'] = str(decks[0]) + ' ' + str(decks[1])
-        
-        if len(decks) >= 4:
-            mask2 = (decks_df['deck_name'] == decks[2]) | (decks_df['deck_name'] == decks[3])
-            decks_df.loc[mask2, 'deck_name'] = str(decks[2]) + ' ' + str(decks[3])
-        
-    print(decks_df.head())
 
-    generate_deck_files(decks_df, output_path=f'output/{format}')
+        mask1 = (decks_df['deck_name'] == decks[0]) | (decks_df['deck_name'] == decks[1])
+        decks_df.loc[mask1, 'deck_name'] = str(decks[0]) + ' ' + str(decks[1])
+
+        mask2 = (decks_df['deck_name'] == decks[2]) | (decks_df['deck_name'] == decks[3])
+        decks_df.loc[mask2, 'deck_name'] = str(decks[2]) + ' ' + str(decks[3])
+        decks = (
+            decks[0] + ' ' + decks[1],
+            decks[2] + ' ' + decks[3],
+            None,
+            None
+            )
+
+    generate_deck_files(decks_df, format)
 
     conn.close()
-    
-    print(decks)
+
     return decks
 
 def setup_game(game):
     logging.info(f"Starting game {game['primary_key']} with decks: {game['deck1_name']}, {game['deck2_name']}, {game.get('deck3_name')}, {game.get('deck4_name')}")
 
-    game['deck1_name'], game['deck2_name'], game['deck3_name'], game['deck4_name'] = update_decks(
+    updated_decks = update_decks(
         [
             game['deck1_name'],
             game['deck2_name'],
@@ -106,7 +107,19 @@ def setup_game(game):
         ],
         game['format'],
     )
-        
+
+    # Update deck names with modified names (usually running Jumpstart half decks)
+    if game['format'] == 'jumpstart':
+        game['deck1_name'] = updated_decks[0]
+        game['deck2_name'] = updated_decks[1]
+        game['deck3_name'] = updated_decks[2]
+        game['deck4_name'] = updated_decks[3]
+
+        # Change format to constructed so game doesn't look in Jumpstart subdirectory
+        game['format'] = 'constructed'
+
+
+
     game['results'] = run_game(
         deck1_name=game['deck1_name'],
         deck2_name=game['deck2_name'],

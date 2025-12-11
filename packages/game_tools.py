@@ -6,7 +6,7 @@ import time
 import os
 import logging
 
-def run_game(deck1_name, deck2_name, deck3_name=None, deck4_name=None, game_count=1, working_dir=None, format='jumpstart'):
+def run_game(deck1_name, deck2_name, deck3_name=None, deck4_name=None, game_count=1, working_dir=None, format='constructed'):
     """
     Run a single game between two to four decks
 
@@ -27,36 +27,44 @@ def run_game(deck1_name, deck2_name, deck3_name=None, deck4_name=None, game_coun
     logging.info(f"Running game: {deck1_name} vs {deck2_name} vs {deck3_name} vs {deck4_name}")
     logging.info(f"Game count: {game_count}, Format: {format}")
     logging.info(f"Working directory: {working_dir}")
-
     original_cwd = os.getcwd()
-    logging.info("start try")
+    # logging.info("start try")
     try:
         if working_dir:
-            logging.info("working dir:", working_dir)
+            # logging.info("working dir:", working_dir)
             os.chdir(working_dir)
             logging.info(f"Changed to working directory: {os.getcwd()}")
         logging.info("creating deck paths")
-        deck1_path = os.path.join(format.upper(), f'{deck1_name}.dck')
-        deck2_path = os.path.join(format.upper(), f'{deck2_name}.dck')
+        # deck1_path = os.path.join(format.upper(), f'{deck1_name}.dck')
+        # deck2_path = os.path.join(format.upper(), f'{deck2_name}.dck')
         logging.info("creating cmd")
         cmd = [
             "java", "-jar", os.path.basename(os.environ.get("FORGE_JAR_PATH", "")),
             "sim", "-d",
-            deck1_path,
-            deck2_path,
+            deck1_name,
+            deck2_name,
         ]
-        logging.info(f"Added deck1: {deck1_path}")
-        logging.info(f"Added deck2: {deck2_path}")
+        logging.info(f"Added deck1: {deck1_name}")
+        logging.info(f"Added deck2: {deck2_name}")
 
         # Add deck3 and deck4 if provided (for 3 to 4 player games)
         if deck3_name:
-            deck3_path = os.path.join(format.upper(), f'{deck3_name}.dck')
-            cmd.append(deck3_path)
-            logging.info(f"Added deck3: {deck3_path}")
+            cmd.append(deck3_name)
         if deck4_name:
-            deck4_path = os.path.join(format.upper(), f'{deck4_name}.dck')
-            cmd.append(deck4_path)
-            logging.info(f"Added deck4: {deck4_path}")
+            cmd.append(deck4_name)
+
+        # Old logic for when game mode was Jumpstart
+        # if deck3_name:
+        #     # deck3_path = os.path.join(format.upper(), f'{deck3_name}.dck')
+        #     deck3_path = deck3_name
+        #     cmd.append(deck3_path)
+        #     logging.info(f"Added deck3: {deck3_path}")
+        # if deck4_name:
+        #     # deck4_path = os.path.join(format.upper(), f'{deck4_name}.dck')
+        #     deck4_path = deck4_name
+        #     cmd.append(deck4_path)
+        #     logging.info(f"Added deck4: {deck4_path}")
+
 
         cmd.extend([
             "-n", str(game_count),
