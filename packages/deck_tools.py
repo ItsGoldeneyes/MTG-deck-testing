@@ -27,7 +27,7 @@ def generate_decklists(cards_df):
 
     return decks_df
 
-def generate_deck_files(decks_df, output_path="output/jumpstart"):
+def generate_deck_files(decks_df, output_path="output/decks"):
     """
     Creates .dck files for all decks in a decks_df
 
@@ -48,7 +48,7 @@ def generate_deck_files(decks_df, output_path="output/jumpstart"):
         generate_deck_file(deck, deck_name, output_path)
 
     # Copy decks to Forge directory if specified
-    FORGE_DECKS_PATH = os.environ.get("FORGE_DECKS_PATH")
+    FORGE_DECKS_PATH = os.environ.get("FORGE_DECKS_PATH") + f"\\{format}"
     if FORGE_DECKS_PATH and os.path.exists(FORGE_DECKS_PATH):
         print(f"Copying decks to Forge directory: {FORGE_DECKS_PATH}")
 
@@ -82,7 +82,7 @@ def generate_deck_files(decks_df, output_path="output/jumpstart"):
         print("FORGE_DECKS_PATH not set, skipping copy to Forge directory")
 
 
-def generate_deck_file(deck, name='Sample Deck', output_path='output/jumpstart'):
+def generate_deck_file(deck, name='Sample Deck', output_path='output/decks'):
     """
     Saves deck as a .dck file for Forge
 
@@ -217,7 +217,7 @@ def add_lands(cards_df):
     return cards_df
 
 
-def parse_card(card):
+def parse_card(card, format):
     """
     Parses an individual card line from input CSV
 
@@ -241,38 +241,56 @@ def parse_card(card):
     card_dict['quantity'] = split_card[0].split('x')[0]
 
     step = 0
-    for index, word in enumerate(split_card[1:]):
-        if step == 0 and '(' not in word:
-            card_dict['card_name'] = card_dict['card_name'] + ' ' + word
-        elif step == 0:
-            step = 1
 
-        if step == 1:
-            card_dict['set_code'] = card_dict['set_code'] + ' ' + word.strip('()').upper()
-            if ')' in word:
-                step = 2
+    if format == 'jumpstart':
+        for index, word in enumerate(split_card[1:]):
+            if step == 0 and '(' not in word:
+                card_dict['card_name'] = card_dict['card_name'] + ' ' + word
+            elif step == 0:
+                step = 1
+            if step == 1:
+                card_dict['set_code'] = card_dict['set_code'] + ' ' + word.strip('()').upper()
+                if ')' in word:
+                    step = 2
+                    continue
+
+            if step == 2:
+                deck_name = word.strip('[]')
+                card_dict['deck_name'] = card_dict['deck_name'] + ' ' + deck_name
+                if ' - ' in card_dict['deck_name']:
+                    card_dict['colour'] = card_dict['deck_name'].split(' - ')[0].strip()
+                    card_dict['deck_name'] = card_dict['deck_name'].split(' - ')[1].strip()
+                if ']' in word:
+                    step = 3
                 continue
 
-        if step == 2:
-            deck_name = word.strip('[]')
-            card_dict['deck_name'] = card_dict['deck_name'] + ' ' + deck_name
-            if ' - ' in card_dict['deck_name']:
-                card_dict['colour'] = card_dict['deck_name'].split(' - ')[0].strip()
-                card_dict['deck_name'] = card_dict['deck_name'].split(' - ')[1].strip()
-            if ']' in word:
-                step = 3
-            continue
+            if step == 3:
+                card_dict['tag'] = word.split(',')[0].strip('^')
 
-        if step == 3:
-            card_dict['tag'] = word.split(',')[0].strip('^')
+        for key in card_dict:
+            card_dict[key] = card_dict[key].strip().replace('/', '')
 
-    for key in card_dict:
-        card_dict[key] = card_dict[key].strip().replace('/', '')
+        return card_dict
 
-    return card_dict
+    else:
+        for index, word in enumerate(split_card[1:]):
+            if step == 0 and '(' not in word:
+                card_dict['card_name'] = card_dict['card_name'] + ' ' + word
+            elif step == 0:
+                step = 1
+            if step == 1:
+                card_dict['set_code'] = card_dict['set_code'] + ' ' + word.strip('()').upper()
+                if ')' in word:
+                    step = 2
+                    continue
+
+        for key in card_dict:
+            card_dict[key] = card_dict[key].strip().replace('/', '')
+
+        return card_dict
 
 
-def parse_decks(cards):
+def parse_decks(cards, format):
     """
     Parses an input CSV
 
@@ -282,7 +300,11 @@ def parse_decks(cards):
     Returns:
         DataFrame: All cards processed
     """
-    card_list = [parse_card(card) for card in cards]
+    card_list = [parse_card(card, format) for card in cards]
     cards_df = pd.DataFrame.from_dict(card_list)
+
+    if format == 'jumpstart':
+        cards_df = add_lands(cards_df)
+        assert len(cards_df['deck_name'].unique()) == cards_df['quantity'].astype(int).sum() // 20, "Deck count does not match expected value (cards/20)"
 
     return cards_df

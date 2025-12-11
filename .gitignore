@@ -2,7 +2,7 @@ output/*
 !output/.gitkeep
 !output/sample_deck.dck
 
-input/jumpstart.txt
+input/*
 !input/sample_jumpstart.txt
 
 .env
