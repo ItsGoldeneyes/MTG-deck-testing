@@ -27,7 +27,7 @@ def generate_decklists(cards_df):
 
     return decks_df
 
-def generate_deck_files(decks_df, output_path="output/decks", format='constructed'):
+def generate_deck_files(decks_df, output_path="output/decks"):
     """
     Creates .dck files for all decks in a decks_df
 

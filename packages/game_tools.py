@@ -8,19 +8,11 @@ import logging
 from packages.database_tools import conn, cur
 
 
-def create_game(decks,
-                format='constructed',
-                num_games=1,
-                print_decks=False):
+def fetch_decks(format):
+    '''
+    Retrieve unique deck names from database for the specified format
+    '''
 
-
-
-    # Ensure all variables have valid values
-    valid_formats = ['constructed', 'commander', 'jumpstart']
-    if format not in valid_formats:
-        raise ValueError(f"Invalid format '{format}'. Valid options are: {', '.join(valid_formats)}.")
-
-    # Retrieve unique deck names from database for the specified format
     cur.execute(
         f"""SELECT DISTINCT deck_name
         FROM decks
@@ -28,6 +20,29 @@ def create_game(decks,
         ORDER BY deck_name ASC;""",
     )
     deck_names = [row[0] for row in cur.fetchall()]
+
+    return deck_names
+
+
+def create_game(decks,
+                format='constructed',
+                num_games=1,
+                print_decks=False):
+
+    # Ensure all variables have valid values
+    valid_formats = ['constructed', 'commander', 'jumpstart']
+    if format not in valid_formats:
+        raise ValueError(f"Invalid format '{format}'. Valid options are: {', '.join(valid_formats)}.")
+
+    # Retrieve unique deck names from database for the specified format
+    deck_names = fetch_decks(format)
+
+    # Print decks if argument is true
+    if print_decks == True:
+        print(deck_names)
+        cur.close()
+        conn.close()
+        quit()
 
     # Check decks against deck_names
     if decks == 'all':
@@ -37,13 +52,6 @@ def create_game(decks,
         missing_decks = set(selected_decks) - set(deck_names)
         if missing_decks:
             raise ValueError(f"Deck(s) not found: {', '.join(missing_decks)}, run -p without -d to see all valid decks for format -f")
-
-    # Print decks if argument is true
-    if print_decks == True:
-        print(selected_decks)
-        cur.close()
-        conn.close()
-        quit()
 
     if format == 'commander' or format == 'jumpstart':
         player_count = 4

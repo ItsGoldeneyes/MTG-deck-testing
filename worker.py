@@ -89,7 +89,7 @@ def update_decks(
             None
             )
 
-    generate_deck_files(decks_df, format)
+    generate_deck_files(decks_df, output_path=f"output/decks/{format}")
 
     conn.close()
 

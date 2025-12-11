@@ -18,11 +18,14 @@ Add games to database queue for workers to run
 # Set up commandline argument parser
 parser = argparse.ArgumentParser(description="Add game to database queue for workers to run",
                                  formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-parser.add_argument("-d", "--decks", action="store", help="comma separated list of deck names", required=True)
+parser.add_argument("-d", "--decks", action="store", help="comma separated list of deck names", default='')
 parser.add_argument("-n", "--games", action="store", help="number of games to run (per combination if tournament)", default='1')
 parser.add_argument("-f", "--format", action="store", help="game format (constructed, commander, jumpstart)", default='constructed')
 parser.add_argument("-p", "--print_decks", action="store_true", help="print all decks for format, then quit")
 args = vars(parser.parse_args())
+
+if args['decks'] == '' and not args['print_decks']:
+    raise ValueError("Populate one of -d or -p (see -h for help)")
 
 # Ensure all variables have valid values
 try:
