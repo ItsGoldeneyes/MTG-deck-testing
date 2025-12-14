@@ -81,7 +81,6 @@ def generate_deck_files(decks_df, output_path="output/decks"):
     else:
         print("FORGE_DECKS_PATH not set, skipping copy to Forge directory")
 
-
 def generate_deck_file(deck, name='Sample Deck', output_path='output/decks'):
     """
     Saves deck as a .dck file for Forge
@@ -107,7 +106,6 @@ def generate_deck_file(deck, name='Sample Deck', output_path='output/decks'):
         f.write('[Schemes]\n\n')
         f.write('[Conspiracy]\n\n')
         f.write('[Dungeon]')
-
 
 def add_lands(cards_df):
     """
@@ -216,7 +214,6 @@ def add_lands(cards_df):
 
     return cards_df
 
-
 def parse_card(card, format):
     """
     Parses an individual card line from input CSV
@@ -288,7 +285,6 @@ def parse_card(card, format):
             card_dict[key] = card_dict[key].strip().replace('/', '')
 
         return card_dict
-
 
 def parse_decks(cards, format):
     """

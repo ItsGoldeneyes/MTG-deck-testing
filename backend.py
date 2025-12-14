@@ -1,10 +1,13 @@
-from flask import Flask
+
+from dotenv import load_dotenv
+from flask import Flask, request
 from flask_sqlalchemy import SQLAlchemy
+from markupsafe import escape
+import os
+import requests
 from sqlalchemy.orm import DeclarativeBase
 from sqlalchemy import Column, Text, Integer, TIMESTAMP
 from sqlalchemy.dialects.postgresql import UUID, JSON
-from dotenv import load_dotenv
-import os
 
 # Load environment variables
 load_dotenv()
@@ -77,22 +80,43 @@ class Game(db.Model):
     created_on = Column(TIMESTAMP)
     finished_on = Column(TIMESTAMP)
 
-# Endpoints
-@app.route("deck/create", methods=['POST'])
-def deck_create():
-  """
-  Create or update a deck
+def update_card_database():
+  '''
+  Update local json card database from Scryfall API
+  https://api.scryfall.com/bulk-data
+  '''
+  print('TODO: Update card database')
 
-  Arguments:
-    - deck_name
-    - user_id
-    - version_name (optional)
-  """
+# Endpoints
+@app.route("/deck/create", methods=['POST'])
+def deck_create():
+    """
+    Create or update a deck
+
+    Parameters:
+      - deck_name: String
+      - user_id: UUID
+      - version_name (optional): String
+      - format: String
+      - cards: [{cardname: quantity}]
+    """
+    valid_formats = ["constructed", "commander", "jumpstart"]
+    if request.form["format"] not in valid_formats:
+        raise ValueError(f"'format' must be one of {valid_formats}")
+    
+    
+    
+    # TODO: Check all cards against Scryfall bulk download
+    
+    
+    
+    
+    
 
 
 
 if __name__ == "__main__":
-  with app.app_context():
-    db.create_all()
+    with app.app_context():
+        db.create_all()
 
-  app.run(debug=True)
+    app.run(debug=True)
