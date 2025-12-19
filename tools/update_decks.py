@@ -23,6 +23,7 @@ parser = argparse.ArgumentParser(description="Parse Jumpstart decks from input f
 parser.add_argument("-i", "--input", action="store", help="input file", default='input/decks.txt')
 parser.add_argument("-d", "--deck_name", action="store", help="Name of deck", default='deckname')
 parser.add_argument("-f", "--format", action="store", help="game format (constructed, commander, jumpstart)", default='constructed')
+parser.add_argument("-v", "--version_name", action="store", help="deck version nickname", default='')
 parser.add_argument("-u", "--user_id", action="store", default='None')
 args = parser.parse_args()
 args = vars(parser.parse_args())
@@ -41,6 +42,7 @@ except FileNotFoundError:
 user_id = args['user_id']
 deck_name = args['deck_name']
 format = args['format']
+version_name = args['version_name']
 
 # print(f'''
 #         Creating decks for:
@@ -51,7 +53,8 @@ format = args['format']
 result = create_deck(cards,
             user_id,
             deck_name,
-            format)
+            format,
+            version_name)
 if result[0] == True:
     print("Decks uploaded successfully!")
 else:

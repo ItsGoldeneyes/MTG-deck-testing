@@ -274,6 +274,9 @@ def create_deck(cards, user_id, deck_name, format='constructed', version_name=''
 
     cards_df = parse_decks(cards, format=format)
 
+    if format != 'jumpstart':
+        cards_df['deck_name'] = deck_name
+
     # For each distinct deck_name in cards_df, process as a unqiue deck
     for deck_name in cards_df['deck_name'].unique():
         distinct_deck_df = cards_df[cards_df['deck_name'] == deck_name]
