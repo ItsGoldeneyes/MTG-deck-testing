@@ -50,7 +50,7 @@ class DeckCards(db.Model):
 
     card_id = Column(UUID(as_uuid=True), primary_key=True, nullable=False)
     card_name = Column(Text)
-    deck_id = Column(Text)
+    deck_version_id = Column(Text)
     set_code = Column(Text)
     quantity = Column(Integer)
     uploaded_on = Column(TIMESTAMP)
@@ -103,15 +103,15 @@ def deck_create():
     valid_formats = ["constructed", "commander", "jumpstart"]
     if request.form["format"] not in valid_formats:
         raise ValueError(f"'format' must be one of {valid_formats}")
-    
-    
-    
+
+
+
     # TODO: Check all cards against Scryfall bulk download
-    
-    
-    
-    
-    
+
+
+
+
+
 
 
 

@@ -6,22 +6,7 @@ import os
 import io
 import logging
 from packages.database_tools import conn, cur
-
-
-def fetch_decks(format):
-    '''
-    Retrieve unique deck names from database for the specified format
-    '''
-
-    cur.execute(
-        f"""SELECT DISTINCT deck_name
-        FROM decks
-        WHERE format = '{format}'
-        ORDER BY deck_name ASC;""",
-    )
-    deck_names = [row[0] for row in cur.fetchall()]
-
-    return deck_names
+from packages.deck_tools import fetch_decks
 
 
 def create_game(decks,
@@ -40,9 +25,6 @@ def create_game(decks,
     # Print decks if argument is true
     if print_decks == True:
         print(deck_names)
-        cur.close()
-        conn.close()
-        quit()
 
     # Check decks against deck_names
     if decks == 'all':

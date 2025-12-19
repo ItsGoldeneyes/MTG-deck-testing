@@ -1,7 +1,15 @@
 import pandas as pd
 import itertools
-# import shutil
+import uuid
 import os
+import io
+from packages.database_tools import conn, cur
+from datetime import datetime
+import time
+import psycopg2
+import psycopg2.extras
+
+psycopg2.extras.register_uuid()
 
 
 def generate_decklists(cards_df):
@@ -91,21 +99,25 @@ def generate_deck_file(deck, name='Sample Deck', output_path='output/decks'):
         output_path (String): Path to output folder
     """
     os.makedirs(output_path, exist_ok=True)
+    # If file exists, might try to overwrite the same file with another job
+    # TODO: accomodate versions and caching
+    try:
+        with open(os.path.join(output_path, f"{name}.dck"), 'w') as f:
+            f.write('[metadata]\n')
+            f.write(f'Name={name}\n')
+            f.write('[Avatar]\n\n')
+            f.write('[Main]\n')
+            for _, row in deck.iterrows():
+                set_code = row['set_code'] if row['set_code'] else ''
+                f.write(f"{row['quantity']} {row['card_name']}|{set_code}|1\n")
 
-    with open(os.path.join(output_path, f"{name}.dck"), 'w') as f:
-        f.write('[metadata]\n')
-        f.write(f'Name={name}\n')
-        f.write('[Avatar]\n\n')
-        f.write('[Main]\n')
-        for _, row in deck.iterrows():
-            set_code = row['set_code'] if row['set_code'] else ''
-            f.write(f"{row['quantity']} {row['card_name']}|{set_code}|1\n")
-
-        f.write('[Sideboard]\n\n')
-        f.write('[Planes]\n\n')
-        f.write('[Schemes]\n\n')
-        f.write('[Conspiracy]\n\n')
-        f.write('[Dungeon]')
+            f.write('[Sideboard]\n\n')
+            f.write('[Planes]\n\n')
+            f.write('[Schemes]\n\n')
+            f.write('[Conspiracy]\n\n')
+            f.write('[Dungeon]')
+    except:
+        return True
 
 def add_lands(cards_df):
     """
@@ -213,6 +225,120 @@ def add_lands(cards_df):
 
 
     return cards_df
+
+def fetch_decks(format):
+    """
+    Retrieve decks for the specified format
+    """
+    global fetch_decks_last_fetched, fetch_decks_cache
+
+    if 'fetch_decks_last_fetched' not in globals():
+        fetch_decks_last_fetched = 0
+        fetch_decks_cache = []
+
+    current_time = time.time()
+    if current_time - fetch_decks_last_fetched < 20:
+        return fetch_decks_cache
+
+    cur.execute(
+        """
+        SELECT
+            deck_id,
+            deck_name,
+            user_id,
+            format,
+            uploaded_on
+        FROM decks
+        WHERE format = %s
+        ORDER BY deck_name ASC;
+        """,
+        (format,)
+    )
+
+    fetch_decks_cache = cur.fetchall()
+    fetch_decks_last_fetched = current_time
+
+    return fetch_decks_cache
+
+def create_deck(cards, user_id, deck_name, format='constructed', version_name=''):
+    """
+    Creates and uploads a deck from an input text file
+
+    Args:
+        cards (List): List of cards from an input text file
+        format (String): Game format deck is intended for
+        deck_name (String): Deck name string, null if uploaded deck file is Jumpstart
+    """
+    decks = fetch_decks(format)
+    created_time = datetime.now()
+
+    cards_df = parse_decks(cards, format=format)
+
+    # For each distinct deck_name in cards_df, process as a unqiue deck
+    for deck_name in cards_df['deck_name'].unique():
+        distinct_deck_df = cards_df[cards_df['deck_name'] == deck_name]
+
+        # If deck name not in fetched decks, create new uuid
+        deck_map = {deck[1]: deck[0] for deck in decks}
+
+        if deck_name in deck_map:
+            deck_id = deck_map[deck_name]
+        else:
+            deck_id = uuid.uuid4()
+
+        deck_version_id = uuid.uuid4()
+
+        row = (
+            deck_id,
+            deck_version_id,
+            deck_name,
+            version_name,
+            user_id,
+            format,
+            created_time.isoformat()
+        )
+
+        cur.execute(
+            """
+            INSERT INTO decks
+            (deck_id, deck_version_id, deck_name, version_name, user_id, "format", uploaded_on)
+            VALUES (%s, %s, %s, %s, %s, %s, %s)
+            """,
+            row
+        )
+        conn.commit()
+
+        # Add audit columns to distinct_deck_df
+        distinct_deck_df.insert(0, 'deck_version_id', deck_version_id)
+        distinct_deck_df.insert(0, 'card_id', [str(uuid.uuid4()) for _ in range(len(distinct_deck_df))])
+        distinct_deck_df.insert(0, 'uploaded_on', datetime.now().isoformat())
+        distinct_deck_df.insert(0, 'format', format)
+        distinct_deck_df.insert(0, 'category', 'main')
+
+        # Rearrange columns to match table layout
+        distinct_deck_df = distinct_deck_df[['card_id',
+                            'card_name',
+                            'deck_version_id',
+                            'set_code',
+                            'quantity',
+                            'uploaded_on',
+                            'tag',
+                            'colour',
+                            'format',
+                            'category',
+                            ]]
+        # Prepare a CSV buffer from the DataFrame
+        csv_buffer = io.StringIO()
+        distinct_deck_df.to_csv(csv_buffer, index=False, header=False, sep='\t')
+        csv_buffer.seek(0)
+
+        cur.copy_from(csv_buffer, 'deck_cards', sep='\t')
+        conn.commit()
+
+    cur.close()
+    conn.close()
+
+    return [True]
 
 def parse_card(card, format):
     """
