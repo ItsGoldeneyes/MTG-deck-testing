@@ -35,7 +35,7 @@ def generate_decklists(cards_df):
 
     return decks_df
 
-def generate_deck_files(decks_df, output_path="output/decks"):
+def generate_deck_files(decks_df, output_path="output/decks", format='constructed'):
     """
     Creates .dck files for all decks in a decks_df
 
@@ -100,7 +100,7 @@ def generate_deck_file(deck, name='Sample Deck', output_path='output/decks'):
     """
     os.makedirs(output_path, exist_ok=True)
     # If file exists, might try to overwrite the same file with another job
-    # TODO: accomodate versions and caching
+    # TODO: caching
     try:
         with open(os.path.join(output_path, f"{name}.dck"), 'w') as f:
             f.write('[metadata]\n')
@@ -230,35 +230,82 @@ def fetch_decks(format):
     """
     Retrieve decks for the specified format
     """
-    global fetch_decks_last_fetched, fetch_decks_cache
+    global decks_last_fetched, decks_cache
 
-    if 'fetch_decks_last_fetched' not in globals():
-        fetch_decks_last_fetched = 0
-        fetch_decks_cache = []
+    if 'decks_last_fetched' not in globals():
+        decks_last_fetched = 0
+        decks_cache = []
 
     current_time = time.time()
-    if current_time - fetch_decks_last_fetched < 20:
-        return fetch_decks_cache
+    if current_time - decks_last_fetched < 20:
+        return decks_cache
 
     cur.execute(
         """
-        SELECT
+        SELECT DISTINCT
             deck_id,
-            deck_name,
-            user_id,
-            format,
-            uploaded_on
+            deck_name
         FROM decks
-        WHERE format = %s
-        ORDER BY deck_name ASC;
+        WHERE format = %s;
         """,
         (format,)
     )
 
-    fetch_decks_cache = cur.fetchall()
-    fetch_decks_last_fetched = current_time
+    decks_cache = cur.fetchall()
+    decks_cache = {deck[1]: deck[0] for deck in decks_cache}
+    decks_last_fetched = current_time
 
-    return fetch_decks_cache
+    return decks_cache
+
+def fetch_deck_versions(format):
+    """
+    Retrieve all deck versions for the specified format
+    """
+    global decks_last_fetched, decks_cache
+
+    if 'decks_last_fetched' not in globals():
+        decks_last_fetched = 0
+        decks_cache = []
+
+    current_time = time.time()
+    if current_time - decks_last_fetched < 20:
+        return decks_cache
+
+    cur.execute(
+        """
+        SELECT
+            deck_version_id,
+            deck_id
+        FROM decks
+        WHERE format = %s;
+        """,
+        (format,)
+    )
+
+    decks_cache = cur.fetchall()
+    decks_cache = {deck[0]: deck[1] for deck in decks_cache}
+    decks_last_fetched = current_time
+
+    return decks_cache
+
+def fetch_latest_deck_version(deck_id):
+    """
+    Fetch the latest version for a given deck
+    """
+    cur.execute("""
+        SELECT
+            deck_version_id
+        FROM decks
+        WHERE deck_id = %s
+        ORDER BY uploaded_on
+        LIMIT 1
+        """,
+        (deck_id)
+    )
+
+    deck_version_id = cur.fetchone()[0]
+
+    return deck_version_id
 
 def create_deck(cards, user_id, deck_name, format='constructed', version_name=''):
     """
@@ -282,10 +329,8 @@ def create_deck(cards, user_id, deck_name, format='constructed', version_name=''
         distinct_deck_df = cards_df[cards_df['deck_name'] == deck_name]
 
         # If deck name not in fetched decks, create new uuid
-        deck_map = {deck[1]: deck[0] for deck in decks}
-
-        if deck_name in deck_map:
-            deck_id = deck_map[deck_name]
+        if deck_name in decks:
+            deck_id = decks[deck_name]
         else:
             deck_id = uuid.uuid4()
 

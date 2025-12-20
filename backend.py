@@ -50,7 +50,7 @@ class DeckCards(db.Model):
 
     card_id = Column(UUID(as_uuid=True), primary_key=True, nullable=False)
     card_name = Column(Text)
-    deck_version_id = Column(Text)
+    deck_version_id = Column(UUID(as_uuid=True))
     set_code = Column(Text)
     quantity = Column(Integer)
     uploaded_on = Column(TIMESTAMP)
@@ -64,10 +64,10 @@ class Game(db.Model):
     __table_args__ = {"schema": "public"}
 
     primary_key = Column(UUID(as_uuid=True), primary_key=True, nullable=False)
-    deck_id1 = Column(UUID(as_uuid=True))
-    deck_id2 = Column(UUID(as_uuid=True))
-    deck_id3 = Column(UUID(as_uuid=True))
-    deck_id4 = Column(UUID(as_uuid=True))
+    deck_version_id1 = Column(UUID(as_uuid=True))
+    deck_version_id2 = Column(UUID(as_uuid=True))
+    deck_version_id3 = Column(UUID(as_uuid=True))
+    deck_version_id4 = Column(UUID(as_uuid=True))
     job_id = Column(UUID(as_uuid=True))
     game_count = Column(Integer)
     deck1_wins = Column(Integer)

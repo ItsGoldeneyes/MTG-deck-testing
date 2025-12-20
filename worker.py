@@ -47,8 +47,10 @@ def update_decks(
     """
     Update local deck files by pulling from database
     Args:
-        decks (list): List of deck names to update. If empty, update all decks.
+        decks (list): List of deck version ids to update. If empty, update all decks.
         format (str): Game format (constructed, commander, jumpstart)
+    Returns:
+        (list): List of deck names
     """
 
     conn, cur = connect()
@@ -60,12 +62,27 @@ def update_decks(
     # latest_uploaded_on = cur.fetchone()[0]
 
     query = f"""
-        SELECT * FROM decks
-        WHERE format = '{format}'
+        SELECT
+            decks.deck_id,
+            decks.deck_version_id,
+            deck_name,
+            version_name,
+            card_id,
+            card_name,
+            set_code,
+            quantity,
+            tag,
+            colour,
+            deck_cards.format,
+            category
+        FROM deck_cards
+        LEFT JOIN decks
+            ON deck_cards.deck_version_id = decks.deck_version_id
+        WHERE deck_cards.format = '{format}'
         """
     if decks:
         placeholders = ','.join(['%s'] * len(decks))
-        query += f"\nAND deck_name IN ({placeholders})"
+        query += f"\nAND decks.deck_version_id IN ({placeholders})"
         cur.execute(query, decks)
     else:
         cur.execute(query)
@@ -73,52 +90,64 @@ def update_decks(
     rows = cur.fetchall()
     decks_df = pd.DataFrame(rows, columns=[desc[0] for desc in cur.description])
 
+
+    deck_version_map = dict(zip(decks_df['deck_version_id'].astype(str), decks_df['deck_name']))
+    decks_adj = [
+        f"{deck_version_map[str(deck)]}_{deck}" if deck is not None and str(deck) in deck_version_map else None
+        for deck in decks
+    ]
+    decks_df['deck_name'] = (
+        decks_df['deck_name'] + "_" + decks_df['deck_version_id'].astype(str)
+    )
+
     if format == 'jumpstart':
-        if len(decks) != 4:
+        if len(decks_adj) != 4:
             raise ValueError("Jumpstart games must include exactly 4 decks (2 half decks)")
 
-        mask1 = (decks_df['deck_name'] == decks[0]) | (decks_df['deck_name'] == decks[1])
-        decks_df.loc[mask1, 'deck_name'] = str(decks[0]) + ' ' + str(decks[1])
+        mask1 = (decks_df['deck_name'] == decks_adj[0]) | (decks_df['deck_name'] == decks_adj[1])
+        decks_df.loc[mask1, 'deck_name'] = str(decks_adj[0]) + '_' + str(decks_adj[1])
 
-        mask2 = (decks_df['deck_name'] == decks[2]) | (decks_df['deck_name'] == decks[3])
-        decks_df.loc[mask2, 'deck_name'] = str(decks[2]) + ' ' + str(decks[3])
-        decks = (
-            decks[0] + ' ' + decks[1],
-            decks[2] + ' ' + decks[3],
+        mask2 = (decks_df['deck_name'] == decks_adj[2]) | (decks_df['deck_name'] == decks_adj[3])
+        decks_df.loc[mask2, 'deck_name'] = str(decks_adj[2]) + '_' + str(decks_adj[3])
+        decks_adj = (
+            str(decks_adj[0]) + '_' + str(decks_adj[1]),
+            str(decks_adj[2]) + '_' + str(decks_adj[3]),
             None,
             None
             )
+        format = 'constructed'
 
-    generate_deck_files(decks_df, output_path=f"output/decks/{format}")
+    generate_deck_files(decks_df, output_path=f"output/decks/{format}", format=format)
 
     conn.close()
 
-    return decks
+    return decks_adj
 
 def setup_game(game):
-    logging.info(f"Starting game {game['primary_key']} with decks: {game['deck1_name']}, {game['deck2_name']}, {game.get('deck3_name')}, {game.get('deck4_name')}")
+    logging.info(f"Starting game {game['primary_key']} with decks: {game['deck_version_id1']}, {game['deck_version_id2']}, {game.get('deck_version_id3')}, {game.get('deck4_namdeck_version_id4')}")
 
     updated_decks = update_decks(
         [
-            game['deck1_name'],
-            game['deck2_name'],
-            game['deck3_name'],
-            game['deck4_name'],
+            game['deck_version_id1'],
+            game['deck_version_id2'],
+            game['deck_version_id3'],
+            game['deck_version_id4'],
         ],
         game['format'],
     )
 
-    # Update deck names with modified names (usually running Jumpstart half decks)
+    # Remember original format if changed to jumpstart later
+    original_format = game['format']
+
+    # Update deck names with modified names
+    game['deck1_name'] = updated_decks[0]
+    game['deck2_name'] = updated_decks[1]
+    game['deck3_name'] = updated_decks[2]
+    game['deck4_name'] = updated_decks[3]
+
     if game['format'] == 'jumpstart':
-        game['deck1_name'] = updated_decks[0]
-        game['deck2_name'] = updated_decks[1]
-        game['deck3_name'] = updated_decks[2]
-        game['deck4_name'] = updated_decks[3]
-
-        # Change format to constructed so game doesn't look in Jumpstart subdirectory
+        # Change format to constructed so running game doesn't look in Jumpstart subdirectory
         game['format'] = 'constructed'
-
-
 
     game['results'] = run_game(
         deck1_name=game['deck1_name'],
@@ -167,6 +196,22 @@ def setup_game(game):
     logging.info(f"Game {game['primary_key']} - Parsed result: {parsed_result}")
 
     # print(parsed_result)
+    wins = [
+        parsed_result.get('deck1_wins', 0),
+        parsed_result.get('deck2_wins', 0),
+        parsed_result.get('deck3_wins', 0),
+        parsed_result.get('deck4_wins', 0)
+    ]
+
+    # If format is jumpstart, half decks are assigned wins.
+    # deck 1 represents half deck 1 and 2
+    # deck 2 represents half deck 3 and 4
+    if original_format == 'jumpstart':
+        wins[2] = wins[1]
+        wins[3] = wins[1]
+
+        wins[1] = wins[0]
+
 
     conn, cur = connect()
     cur.execute("""
@@ -179,10 +224,10 @@ def setup_game(game):
             finished_on = NOW()
         WHERE primary_key = %s
     """, (
-        parsed_result.get('deck1_wins', 0),
-        parsed_result.get('deck2_wins', 0),
-        parsed_result.get('deck3_wins', 0),
-        parsed_result.get('deck4_wins', 0),
+        wins[0],
+        wins[1],
+        wins[2],
+        wins[3],
         str(parsed_result.get('turn_counts', [])),
         game['primary_key']
     ))
@@ -190,7 +235,6 @@ def setup_game(game):
     conn.close()
     # Remove from current_games after finishing
     current_games.pop(game['primary_key'], None)
-
 
 def check_game_data(interval=10):
     while True:
@@ -207,10 +251,10 @@ def check_game_data(interval=10):
         slots = max_games - len(current_games)
         cur.execute(f"""
             SELECT primary_key,
-                   deck1_name,
-                   deck2_name,
-                   deck3_name,
-                   deck4_name,
+                   deck_version_id1,
+                   deck_version_id2,
+                   deck_version_id3,
+                   deck_version_id4,
                    created_on,
                    format,
                    game_count
@@ -225,10 +269,10 @@ def check_game_data(interval=10):
         for row in rows:
             game = {
                 "primary_key": row[0],
-                "deck1_name": row[1],
-                "deck2_name": row[2],
-                "deck3_name": row[3],
-                "deck4_name": row[4],
+                "deck_version_id1": row[1],
+                "deck_version_id2": row[2],
+                "deck_version_id3": row[3],
+                "deck_version_id4": row[4],
                 "created_on": row[5],
                 "format": row[6],
                 "game_count": row[7]

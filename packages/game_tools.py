@@ -6,13 +6,21 @@ import os
 import io
 import logging
 from packages.database_tools import conn, cur
-from packages.deck_tools import fetch_decks
+from packages.deck_tools import fetch_deck_versions
 
 
-def create_game(decks,
+def create_game(deck_versions,
                 format='constructed',
                 num_games=1,
                 print_decks=False):
+    """_summary_
+
+    Args:
+        deck_versions (List): List of deck_version_ids
+        format (str): Game format. Defaults to 'constructed'.
+        num_games (int): Number of games in job. Defaults to 1.
+        print_decks (bool): Print available decks for a format without creating a game. Defaults to False.
+    """
 
     # Ensure all variables have valid values
     valid_formats = ['constructed', 'commander', 'jumpstart']
@@ -20,20 +28,18 @@ def create_game(decks,
         raise ValueError(f"Invalid format '{format}'. Valid options are: {', '.join(valid_formats)}.")
 
     # Retrieve unique deck names from database for the specified format
-    deck_names = fetch_decks(format)
+    decks = fetch_deck_versions(format)
 
     # Print decks if argument is true
     if print_decks == True:
-        print(deck_names)
+        print(decks)
+        return False
 
     # Check decks against deck_names
-    if decks == 'all':
-        selected_decks = deck_names
-    else:
-        selected_decks = [d.strip() for d in decks.split(',')]
-        missing_decks = set(selected_decks) - set(deck_names)
-        if missing_decks:
-            raise ValueError(f"Deck(s) not found: {', '.join(missing_decks)}, run -p without -d to see all valid decks for format -f")
+    selected_decks = [d.strip() for d in deck_versions.split(',')]
+    missing_decks = set(selected_decks) - set(str(v) for v in decks.keys())
+    if missing_decks:
+        raise ValueError(f"Deck(s) not found: {', '.join(missing_decks)}")
 
     if format == 'commander' or format == 'jumpstart':
         player_count = 4
@@ -45,10 +51,10 @@ def create_game(decks,
     # Assign deck names
     player_dict = {}
     for i in range(player_count):
-        player_dict[f'deck{i+1}_name'] = selected_decks[i]
+        player_dict[f'deck{i+1}_id'] = selected_decks[i]
     # Fill remaining with None if less than 4 players
     for i in range(player_count, 4):
-        player_dict[f'deck{i+1}_name'] = None
+        player_dict[f'deck{i+1}_id'] = None
 
     games_df = pd.DataFrame([player_dict])
 
@@ -114,7 +120,7 @@ def run_game(deck1_name,
             # logging.info("working dir:", working_dir)
             os.chdir(working_dir)
             logging.info(f"Changed to working directory: {os.getcwd()}")
-        logging.info("creating deck paths")
+        # logging.info("creating deck paths")
         # deck1_path = os.path.join(format.upper(), f'{deck1_name}.dck')
         # deck2_path = os.path.join(format.upper(), f'{deck2_name}.dck')
         logging.info("creating cmd")
