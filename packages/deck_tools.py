@@ -44,10 +44,6 @@ def generate_deck_files(decks_df, output_path="output/decks", format='constructe
     """
 
     os.makedirs(output_path, exist_ok=True)
-    for filename in os.listdir(output_path):
-        file_path = os.path.join(output_path, filename)
-        if os.path.isfile(file_path):
-            os.unlink(file_path)
 
     deck_names = decks_df['deck_name'].unique()
 
