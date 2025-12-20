@@ -161,8 +161,8 @@ def run_game(deck1_name,
 
         game_output = subprocess.run(cmd, capture_output=True, text=True, timeout=game_count*60)
         logging.info("Game subprocess completed")
-        logging.info(game_output)
-        logging.info(f"Game completed with return code: {game_output.returncode}")
+        # logging.info(game_output)
+        # logging.info(f"Game completed with return code: {game_output.returncode}")
         if game_output.returncode != 0:
             logging.error(f"Game failed with stderr: {game_output.stderr}")
 
