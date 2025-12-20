@@ -159,7 +159,7 @@ def run_game(deck1_name,
 
         logging.info(f"Running command: {' '.join(cmd)}")
 
-        game_output = subprocess.run(cmd, capture_output=True, text=True, timeout=game_count*60)
+        game_output = subprocess.run(cmd, capture_output=True, text=True, timeout=game_count*120)
         logging.info("Game subprocess completed")
         # logging.info(game_output)
         # logging.info(f"Game completed with return code: {game_output.returncode}")
