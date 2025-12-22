@@ -1,4 +1,4 @@
-1x Aberrant Mind Sorcerer (afr) [U - Dice!] ^Creature,#7ef553^
+1x Aberrant Mind Sorcerer (afr) [U - Lucky] ^Creature,#7ef553^
 1x Abzan Falconer (moc) [W - Valiant] ^Creature,#7ef553^
 1x Ainok Wayfarer (tdm) [G  - Beefy] ^Creature,#7ef553^
 1x Ajani's Pridemate (m19) [W - Rejuvenating] ^Creature,#7ef553^
@@ -10,11 +10,11 @@
 1x Aphelia, Viper Whisperer (j25) [B - Plundering] ^Creature,#7ef553^
 1x Arahbo, the First Fang (fdn) [W - Cats] ^Creature,#7ef553^
 1x Armorcraft Judge (j25) [G  - Beefy] ^Creature,#7ef553^
+1x Attended Healer (znr) [W - Rejuvenating] ^Creature,#7ef553^
 1x Augury Owl (pca) [U -  Flappy] ^Creature,#7ef553^
 1x Awakener Druid (jmp) [G - Flourishing] ^Creature,#7ef553^
 1x Basri's Acolyte (j22) [W - Valiant] ^Creature,#7ef553^
 1x Basri's Lieutenant (j25) [W - Valiant] ^Creature,#7ef553^
-1x Bathe in Dragonfire (jmp) [R - Dragons] ^Removal,#fb3335^
 1x Battle Cry Goblin (afr) [R - Goblins] ^Creature,#7ef553^
 1x Battlefield Promotion (jmp) [W - Valiant] ^Noncreature,#00edff^
 1x Beetleback Chief (tdc) [R - Goblins] ^Creature,#7ef553^
@@ -22,7 +22,7 @@
 1x Bitter Triumph (lci) [B - Necromancy] ^Removal,#fb3335^
 1x Bloodthirsty Aerialist (c21) [B - Bloodthirsty] ^Creature,#7ef553^
 1x Body Double (cmm) [U - Brainrot] ^Creature,#7ef553^
-1x Boing! (unf) [U - Dice!] ^Removal,#fb3335^
+1x Boing! (unf) [U - Lucky] ^Removal,#fb3335^
 1x Bond of Insight (war) [U - Brainrot] ^Noncreature,#00edff^
 1x Borderland Marauder (jmp) [R - Aggressive] ^Creature,#7ef553^
 1x Bounty of Skemfar (j25) [G - Elvish] ^Noncreature,#00edff^
@@ -46,7 +46,7 @@
 1x Commune with Dinosaurs (j25) [G - Dinos] ^Noncreature,#00edff^
 1x Compulsive Research (tdc) [U - Elemental] ^Noncreature,#00edff^
 1x Condemn (rvr) [W - Rejuvenating] ^Removal,#fb3335^
-1x Cone of Cold (clb) [U - Dice!] ^Noncreature,#00edff^
+1x Cone of Cold (clb) [U - Lucky] ^Noncreature,#00edff^
 1x Courageous Goblin (fdn) [R - Aggressive] ^Creature,#7ef553^
 1x Creeping Bloodsucker (j25) [B - Bloodthirsty] ^Creature,#7ef553^
 1x Crested Herdcaller (gn2) [G - Dinos] ^Creature,#7ef553^
@@ -60,6 +60,7 @@
 1x Djinni Windseer (afr) [U -  Flappy] ^Creature,#7ef553^
 1x Dragon Fodder (gnt) [R - Goblins] ^Noncreature,#00edff^
 1x Dragon Hatchling (jmp) [R - Dragons] ^Creature,#7ef553^
+1x Dragon's Fire (afr) [R - Dragons] ^Removal,#fb3335^
 1x Dragonlord's Servant (tdc) [R - Dragons] ^Creature,#7ef553^
 1x Drana, Liberator of Malakir (lcc) [B - Plundering] ^Creature,#7ef553^
 1x Draugr Recruiter (khm) [B - Plundering] ^Creature,#7ef553^
@@ -76,7 +77,6 @@
 1x Elvish Doomsayer (cmr) [B - Morbid] ^Creature,#7ef553^
 1x Elvish Visionary (cma) [G - Elvish] ^Creature,#7ef553^
 1x Elvish Warmaster (khm) [G - Elvish] ^Creature,#7ef553^
-1x Emancipation Angel (jmp) [W - Angelic] ^Creature,#7ef553^
 1x Emeria Angel (tdc) [W - Angelic] ^Creature,#7ef553^
 1x Etali, Primal Storm (fdn) [R - Aggressive] ^Creature,#7ef553^
 1x Eternal Taskmaster (jmp) [B - Necromancy] ^Creature,#7ef553^
@@ -87,8 +87,9 @@
 1x Felling Blow (fdn) [G  - Beefy] ^Removal,#fb3335^
 1x Feral Hydra (j22) [G  - Beefy] ^Creature,#7ef553^
 1x Fertilid (moc) [G - Flourishing] ^Creature,#7ef553^
-1x Feywild Trickster (afr) [U - Dice!] ^Creature,#7ef553^
+1x Feywild Trickster (afr) [U - Lucky] ^Creature,#7ef553^
 1x Firecannon Blast (j22) [R - Aggressive] ^Removal,#fb3335^
+1x Firespitter Whelp (fdn) [R - Dragons] ^Creature,#7ef553^
 1x Frenzied Goblin (fdn) [R - Aggressive] ^Creature,#7ef553^
 1x Frenzied Goblin (fdn) [R - Goblins] ^Creature,#7ef553^
 1x Ghalta, Primal Hunger (fdn) [G - Dinos] ^Creature,#7ef553^
@@ -122,8 +123,7 @@
 1x Ironshell Beetle (j22) [G  - Beefy] ^Creature,#7ef553^
 1x Ivy Lane Denizen (clu) [G - Elvish] ^Creature,#7ef553^
 1x Jace's Phantasm (ima) [U - Brainrot] ^Creature,#7ef553^
-1x Jalira, Master Polymorphist (plst) [U - Dice!] ^Creature,#7ef553^
-1x Kolaghan Warmonger (mat) [R - Dragons] ^Creature,#7ef553^
+1x Jalira, Master Polymorphist (plst) [U - Lucky] ^Creature,#7ef553^
 1x Koma's Faithful (khm) [B - Bloodthirsty] ^Creature,#7ef553^
 1x Koma's Faithful (khm) [B - Necromancy] ^Creature,#7ef553^
 1x Krenko, Mob Boss (fdn) [R - Goblins] ^Creature,#7ef553^
@@ -133,7 +133,7 @@
 1x Lightwalker (jmp) [W - Valiant] ^Creature,#7ef553^
 1x Locked in the Cemetery (mid) [U - Brainrot] ^Removal,#fb3335^
 1x Marauding Blight-Priest (fdn) [B - Bloodthirsty] ^Creature,#7ef553^
-1x Mathise, Surge Channeler (slx) [U - Dice!] ^Creature,#7ef553^
+1x Mathise, Surge Channeler (slx) [U - Lucky] ^Creature,#7ef553^
 1x Merfolk Windrobber (znr) [U -  Flappy] ^Creature,#7ef553^
 1x Miara, Thorn of the Glade (cmr) [B - Morbid] ^Creature,#7ef553^
 1x Mikaeus, the Lunarch (jmp) [W - Valiant] ^Creature,#7ef553^
@@ -148,10 +148,10 @@
 1x Path to Exile (otc) [W - Cats] ^Removal,#fb3335^
 1x Patron of the Valiant (jmp) [W - Valiant] ^Creature,#7ef553^
 1x Phantom Wings (bok) [U -  Flappy] ^Removal,#fb3335^
-1x Pixie Guide (afr) [U - Dice!] ^Creature,#7ef553^
+1x Pixie Guide (afr) [U - Lucky] ^Creature,#7ef553^
 1x Pollenbright Druid (cmm) [G - Elvish] ^Creature,#7ef553^
 1x Polukranos, World Eater (ddl) [G  - Beefy] ^Creature,#7ef553^
-1x Power of Persuasion (afr) [U - Dice!] ^Removal,#fb3335^
+1x Power of Persuasion (afr) [U - Lucky] ^Removal,#fb3335^
 1x Prava of the Steel Legion (cmr) [W - Cats] ^Creature,#7ef553^
 1x Prayer of Binding (fdn) [W - Angelic] ^Removal,#fb3335^
 1x Prideful Parent (fdn) [W - Cats] ^Creature,#7ef553^
@@ -177,7 +177,7 @@
 1x Sanguine Bond (c17) [B - Bloodthirsty] ^Noncreature,#00edff^
 1x Sanguine Syphoner (fdn) [B - Plundering] ^Creature,#7ef553^
 1x Scalestorm Summoner (otj) [R - Aggressive] ^Creature,#7ef553^
-1x Scion of Stygia (afr) [U - Dice!] ^Removal,#fb3335^
+1x Scion of Stygia (afr) [U - Lucky] ^Removal,#fb3335^
 1x Screaming Phantom (lci) [B - Necromancy] ^Creature,#7ef553^
 1x Selhoff Occultist (jmp) [U - Brainrot] ^Creature,#7ef553^
 1x Serra Angel (v15) [W - Angelic] ^Creature,#7ef553^
@@ -192,10 +192,10 @@
 1x Snap (dmr) [U - Elemental] ^Removal,#fb3335^
 1x Speaker of the Heavens (j25) [W - Rejuvenating] ^Creature,#7ef553^
 1x Stab Wound (rtr) [B - Plundering] ^Removal,#fb3335^
+1x Starnheim Aspirant (khm) [W - Angelic] ^Creature,#7ef553^
 1x Steadfast Sentry (j25) [W - Valiant] ^Creature,#7ef553^
 1x Stitcher's Supplier (j22) [B - Necromancy] ^Creature,#7ef553^
 1x Storm Fleet Negotiator (lcc) [U - Elemental] ^Creature,#7ef553^
-1x Sungrace Pegasus (j25) [W - Rejuvenating] ^Creature,#7ef553^
 1x Sutina, Speaker of the Tajuru (j25) [G - Flourishing] ^Creature,#7ef553^
 1x Swallow Whole (iko) [W - Valiant] ^Removal,#fb3335^
 1x Swarming Goblins (afr) [R - Gambling] ^Creature,#7ef553^
@@ -215,9 +215,9 @@
 1x Urdnan, Dromoka Warrior (j25) [W - Valiant] ^Creature,#7ef553^
 1x Vampire Nighthawk (j25) [B - Bloodthirsty] ^Creature,#7ef553^
 1x Vantress Gargoyle (eld) [U - Brainrot] ^Creature,#7ef553^
-1x Vedalken Squirrel-Whacker (unf) [U - Dice!] ^Creature,#7ef553^
+1x Vedalken Squirrel-Whacker (unf) [U - Lucky] ^Creature,#7ef553^
 1x Viconia, Drow Apostate (clb) [B - Necromancy] ^Creature,#7ef553^
-1x Wall of Fortune (ust) [U - Dice!] ^Creature,#7ef553^
+1x Wall of Fortune (ust) [U - Lucky] ^Creature,#7ef553^
 1x Wall of Lost Thoughts (jmp) [U - Brainrot] ^Creature,#7ef553^
 1x Warbriar Blessing (thb) [G - Elvish] ^Removal,#fb3335^
 1x Warden of Evos Isle (cmr) [U -  Flappy] ^Creature,#7ef553^
@@ -234,7 +234,7 @@
 1x Wolverine Riders (j22) [G - Elvish] ^Creature,#7ef553^
 1x Woodborn Behemoth (j22) [G - Flourishing] ^Creature,#7ef553^
 1x You Are Already Dead (neo) [B - Plundering] ^Removal,#fb3335^
-1x You Find the Villains' Lair (afr) [U - Dice!] ^Removal,#fb3335^
+1x You Find the Villains' Lair (afr) [U - Lucky] ^Removal,#fb3335^
 1x Young Necromancer (mh2) [B - Necromancy] ^Creature,#7ef553^
 1x Youthful Valkyrie (fdn) [W - Angelic] ^Creature,#7ef553^
 1x Zhentarim Bandit (clb) [B - Plundering] ^Creature,#7ef553^
